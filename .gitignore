@@ -1,0 +1,23 @@
+# Dependencies & build
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Env (secrets)
+.env
+.env.*
+!.env.example
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Cursor / MCP (local)
+.cursor/
