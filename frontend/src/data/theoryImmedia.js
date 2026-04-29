@@ -165,3 +165,31 @@ export const immediaEspecialista = {
     },
   ],
 }
+
+/**
+ * Misma forma que roles en theoryImcontent; orden para la biblioteca.
+ * @type {import('./theoryImcontent').ImcontentRole[]}
+ */
+export const IMMEDIA_ROLES_ORDER = [
+  {
+    id: 'immedia-head',
+    title: immediaHead.title,
+    reportaA: immediaHead.reportaA,
+    colaboraCon: immediaHead.colaboraCon,
+    lideraA: immediaHead.lideraA,
+    resumen: immediaHead.resumen,
+    responsabilidades: immediaHead.responsabilidades,
+    kpis: immediaHead.kpis,
+  },
+  {
+    id: 'immedia-especialista',
+    title: immediaEspecialista.title,
+    reportaA: immediaEspecialista.reportaA,
+    colaboraCon: immediaEspecialista.colaboraCon,
+    contextoExtra: immediaEspecialista.notaCliente,
+    resumen: immediaEspecialista.resumen,
+    responsabilidades: immediaEspecialista.responsabilidades,
+    noResponsabilidades: immediaEspecialista.noResponsabilidades,
+    kpis: immediaEspecialista.kpis,
+  },
+]

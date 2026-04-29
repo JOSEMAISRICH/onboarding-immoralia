@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 
 const CHEER_LINES = [
   'Modo maquina: ON.',
@@ -7,14 +7,37 @@ const CHEER_LINES = [
   'Psst… la siguiente te va a gustar.',
 ]
 
+/** Capítulo 0: siempre teoría antes que minijuegos. */
+const THEORY_CHAPTER = {
+  stepIndex: 0,
+  title: 'Teoría y biblioteca',
+  objective: 'Lee el contexto de tu espacio y las fichas. Siempre el primer paso.',
+  minutes: 15,
+  emoji: '📚',
+}
+
 /**
- * Camino tipo Duolingo: lecciones con estado completado / actual / bloqueado.
+ * Camino tipo mapa: capítulos enlazables (nueva pestaña) + estado en el recorrido actual.
  * @param {{ units: Array<{ stepIndex: number, title: string, objective: string, minutes: number, emoji: string }>, currentStep: number }} props
  */
-function LearningPath({ units, currentStep }) {
+function LearningPath({ units, currentStep, compact = false }) {
   const currentRef = useRef(null)
   const cheerIndex =
     units.length > 0 ? Math.abs(currentStep * 13 + units.length) % CHEER_LINES.length : 0
+
+  const { theoryHref, minijuegosHref } = useMemo(() => {
+    const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
+    const origin = typeof window !== 'undefined' ? window.location.origin : ''
+    const root = `${origin}${base}`
+    return {
+      theoryHref: `${root}/teoria`,
+      minijuegosHref: `${root}/minijuegos`,
+    }
+  }, [])
+
+  const fullUnits = useMemo(() => [THEORY_CHAPTER, ...units], [units])
+
+  const chapterHref = (stepIndex) => (stepIndex === 0 ? theoryHref : minijuegosHref)
 
   useEffect(() => {
     currentRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
@@ -22,32 +45,40 @@ function LearningPath({ units, currentStep }) {
 
   return (
     <section
-      className="rounded-2xl border border-amber-400/25 bg-indigo-950/50 p-4 shadow-inner shadow-amber-900/15 backdrop-blur-sm"
+      className={`rounded-2xl border border-violet-400/30 bg-gradient-to-b from-indigo-950/70 via-indigo-950/50 to-slate-950/60 shadow-inner shadow-violet-950/25 backdrop-blur-sm ${compact ? 'p-3' : 'p-4'}`}
       aria-label="Camino de aprendizaje"
     >
-      <div className="mb-4 flex items-center justify-between gap-2 border-b border-amber-500/15 pb-3">
-        <h3 className="flex items-center gap-2 text-lg font-bold text-amber-50 md:text-xl">
-          <span className="animate-emoji-pop inline-block text-2xl" aria-hidden>
-            🗺️
-          </span>
-          Tu camino
-        </h3>
-        <span className="rounded-full bg-gradient-to-r from-amber-500/25 to-fuchsia-500/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-100/95 ring-1 ring-amber-400/25">
-          Aventura guiada
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-2 border-b border-violet-500/20 pb-3">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-violet-200/85">
+            Rango del recorrido
+          </p>
+          <h3 className={`mt-1 flex flex-wrap items-center gap-2 font-bold text-amber-50 md:text-xl ${compact ? 'text-base' : 'text-lg'}`}>
+            <span className="animate-emoji-pop inline-block text-2xl" aria-hidden>
+              🗺️
+            </span>
+            Mapa de capítulos
+          </h3>
+        </div>
+        <span className="rounded-full border border-violet-400/35 bg-violet-500/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-violet-100/95">
+          Clic → nueva pestaña
         </span>
       </div>
       <p className="mb-2 text-sm font-semibold text-fuchsia-200/90">{CHEER_LINES[cheerIndex]}</p>
-      <p className="mb-5 text-xs leading-relaxed text-amber-100/70 md:text-sm">
-        Objetivo claro en cada paso; practicas y ves el feedback al momento. Puedes pausar y retomar cuando quieras.
+      <p className="mb-5 text-xs leading-relaxed text-violet-100/75 md:text-sm">
+        Cada bloque abre la ruta en otra pestaña (como el enlace de teoría en la barra). Así puedes consultar un
+        capítulo sin perder donde ibas. Lo que te falta por descubrir va con candado en tu sesión principal.
       </p>
 
-      <div className="max-h-[min(420px,52vh)] overflow-y-auto overflow-x-hidden pr-1">
+      <div className={compact ? 'max-h-[min(260px,38vh)] overflow-y-auto overflow-x-hidden pr-1' : 'max-h-[min(420px,52vh)] overflow-y-auto overflow-x-hidden pr-1'}>
         <ol className="mx-auto max-w-lg">
-          {units.map((u, i) => {
+          {fullUnits.map((u, i) => {
             const isDone = currentStep > u.stepIndex
             const isCurrent = currentStep === u.stepIndex
             const isLocked = currentStep < u.stepIndex
-            const last = i === units.length - 1
+            const last = i === fullUnits.length - 1
+            const prevDone = i > 0 && currentStep > fullUnits[i - 1].stepIndex
+            const href = chapterHref(u.stepIndex)
 
             return (
               <li
@@ -58,7 +89,7 @@ function LearningPath({ units, currentStep }) {
                 <div className="flex w-11 shrink-0 flex-col items-center">
                   {i > 0 ? (
                     <div
-                      className={`h-4 w-0.5 ${units[i - 1] && currentStep > units[i - 1].stepIndex ? 'bg-emerald-500/55' : 'bg-slate-600/45'}`}
+                      className={`h-4 w-0.5 ${prevDone ? 'bg-emerald-500/55' : 'bg-slate-600/45'}`}
                       aria-hidden
                     />
                   ) : null}
@@ -83,29 +114,35 @@ function LearningPath({ units, currentStep }) {
                   ) : null}
                 </div>
 
-                <div
-                  className={`mb-5 min-w-0 flex-1 rounded-xl border px-3 py-2.5 transition ${
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`group mb-5 min-w-0 flex-1 rounded-xl border px-3 py-2.5 text-left shadow-sm transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 ${
                     isCurrent
-                      ? 'border-amber-400/60 bg-gradient-to-br from-amber-500/25 to-rose-900/25 ring-2 ring-amber-400/30'
+                      ? 'border-amber-400/70 bg-gradient-to-br from-amber-500/30 to-violet-900/30 ring-2 ring-amber-400/35'
                       : isDone
-                        ? 'border-emerald-500/25 bg-emerald-950/20'
-                        : 'border-slate-700/50 bg-slate-950/40 opacity-80'
-                  }`}
+                        ? 'border-emerald-500/35 bg-emerald-950/25 hover:border-emerald-400/50'
+                        : 'border-slate-600/60 bg-slate-950/50 hover:border-violet-400/40 hover:bg-slate-900/70'
+                  } ${isLocked ? 'opacity-85' : ''}`}
                 >
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-amber-200/80">
-                    Unidad {i + 1} · ~{u.minutes} min
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-violet-200/90">
+                    Capítulo {i + 1} · ~{u.minutes} min
                   </p>
                   <p className="mt-1 text-base font-bold leading-snug text-white md:text-lg">{u.title}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-400">{u.objective}</p>
-                  {isCurrent ? (
-                    <p className="mt-2 text-xs font-semibold text-amber-200 md:text-sm">
-                      Dale caña a la actividad de abajo
-                    </p>
-                  ) : null}
-                  {isLocked ? (
-                    <p className="mt-2 text-xs text-slate-500">Candado: completa lo de arriba primero</p>
-                  ) : null}
-                </div>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-400 group-hover:text-slate-300">
+                    {u.objective}
+                  </p>
+                  <p className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-semibold text-violet-200/90">
+                    <span className="rounded-md bg-violet-500/20 px-2 py-0.5">↗ Abrir en pestaña nueva</span>
+                    {isCurrent ? (
+                      <span className="rounded-md bg-amber-500/20 px-2 py-0.5 text-amber-100">Tu sesión aquí</span>
+                    ) : null}
+                    {isLocked ? (
+                      <span className="text-slate-500">En la pestaña principal: completa lo anterior</span>
+                    ) : null}
+                  </p>
+                </a>
               </li>
             )
           })}

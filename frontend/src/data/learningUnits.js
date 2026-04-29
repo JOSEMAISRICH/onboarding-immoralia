@@ -1,4 +1,5 @@
 import { EXTRA_GAME_KEYS, extraGames } from './extraMinijuegos10'
+import { EXTRA_START_STEP } from '../lib/onboardingSteps'
 
 /**
  * @typedef {{ stepIndex: number, title: string, objective: string, minutes: number, emoji: string }} LearningUnit
@@ -67,13 +68,41 @@ export function getLearningUnits(finishStepIndex) {
       minutes: 3,
       emoji: '🎯',
     },
+    {
+      stepIndex: 9,
+      title: 'Escenarios',
+      objective: 'Elegir la reaccion mas alineada con cultura y proceso.',
+      minutes: 4,
+      emoji: '🎬',
+    },
+    {
+      stepIndex: 10,
+      title: 'Memoria',
+      objective: 'Emparejar conceptos clave (dos intentos de memoria visual).',
+      minutes: 3,
+      emoji: '🃏',
+    },
+    {
+      stepIndex: 11,
+      title: 'Palabra oculta',
+      objective: 'Adivinar el termino en un numero limitado de intentos.',
+      minutes: 4,
+      emoji: '🟩',
+    },
+    {
+      stepIndex: 12,
+      title: 'A quien consultar',
+      objective: 'Asignar cada caso al rol adecuado del equipo.',
+      minutes: 4,
+      emoji: '🧭',
+    },
   ])
 
   const extras = EXTRA_GAME_KEYS.map((key, i) => {
     const g = extraGames.find((x) => x.key === key)
     const shortTitle = g?.title ? `${g.title}` : `Extra ${i + 1}`
     return {
-      stepIndex: 9 + i,
+      stepIndex: EXTRA_START_STEP + i,
       title: g?.listTitle || `Extra ${i + 1}`,
       objective: `Refuerzo: ${shortTitle.toLowerCase()}.`,
       minutes: 2,

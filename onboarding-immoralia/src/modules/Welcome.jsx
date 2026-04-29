@@ -19,7 +19,7 @@ function Welcome({ defaultName = '', defaultWorkplace = 'general', onStart }) {
   return (
     <ModuleWrapper
       title="Bienvenida al onboarding"
-      subtitle="Primero elige tu espacio; luego tu nombre. Despues iras a la pagina solo de teoria y, cuando quieras, a los minijuegos. La teoria la tendras siempre a mano en otra pestana durante el recorrido."
+      subtitle="Primero elige tu espacio y tu nombre. El siguiente paso es siempre la teoría: lectura de tu espacio antes de cualquier minijuego. Los repasos con puntos vienen después."
     >
       <div className="mb-6 rounded-xl border border-cyan-300/30 bg-gradient-to-br from-cyan-500/12 to-fuchsia-500/10 px-4 py-4 md:px-5 md:py-5">
         <p className="text-[11px] font-bold uppercase tracking-widest text-cyan-300/90">Antes de empezar</p>
@@ -75,7 +75,7 @@ function Welcome({ defaultName = '', defaultWorkplace = 'general', onStart }) {
           <label htmlFor="name" className="text-lg font-bold text-white md:text-xl">
             Como te llamas?
           </label>
-          <p className="text-xs text-slate-500 md:text-sm">Nombre o apodo; lo veras en teoria y minijuegos.</p>
+          <p className="text-xs text-slate-500 md:text-sm">Nombre o apodo; lo verás en teoría y en el recorrido de minijuegos.</p>
           <input
             id="name"
             type="text"
@@ -88,9 +88,9 @@ function Welcome({ defaultName = '', defaultWorkplace = 'general', onStart }) {
 
         <button
           type="submit"
-          className="rounded-xl bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300 px-4 py-3.5 text-lg font-bold text-slate-900 shadow-lg shadow-emerald-900/25 transition hover:scale-[1.02] hover:brightness-105 active:scale-[0.99] md:text-xl"
+          className="rounded-xl bg-gradient-to-r from-cyan-300 via-teal-300 to-emerald-300 px-4 py-3.5 text-lg font-bold text-slate-900 shadow-lg shadow-cyan-900/25 transition hover:scale-[1.02] hover:brightness-105 active:scale-[0.99] md:text-xl"
         >
-          Entrar al onboarding
+          Ir a la teoría
         </button>
       </form>
     </ModuleWrapper>

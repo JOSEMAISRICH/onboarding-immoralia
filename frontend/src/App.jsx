@@ -1,14 +1,29 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import DevStepSkipBanner from './components/DevStepSkipBanner'
+import { lazy, Suspense } from 'react'
+import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom'
 import PlayfulBackdrop from './components/PlayfulBackdrop'
 import StepCompleteOverlay from './components/StepCompleteOverlay'
 import { OnboardingProvider, useOnboarding } from './context/OnboardingContext'
-import GamesPage from './pages/GamesPage'
-import TheoryFichaPage from './pages/TheoryFichaPage'
-import SopDetailPage from './pages/SopDetailPage'
-import SopsPage from './pages/SopsPage'
-import TheoryPage from './pages/TheoryPage'
 import WelcomePage from './pages/WelcomePage'
+
+const GamesPage = lazy(() => import('./pages/GamesPage'))
+const TheoryPage = lazy(() => import('./pages/TheoryPage'))
+const TheoryFichaPage = lazy(() => import('./pages/TheoryFichaPage'))
+const SopsPage = lazy(() => import('./pages/SopsPage'))
+const SopDetailPage = lazy(() => import('./pages/SopDetailPage'))
+
+function RouteFallback() {
+  return (
+    <div className="flex min-h-[50vh] items-center justify-center text-sm text-slate-400">
+      Cargando…
+    </div>
+  )
+}
+
+/** Compatibilidad con enlaces antiguos a /procedimientos → /sops */
+function ProcedimientosToSopRedirect() {
+  const { sopId } = useParams()
+  return <Navigate to={`/sops/${encodeURIComponent(sopId || '')}`} replace />
+}
 
 /** Globales que deben verse tambien fuera de /minijuegos (p. ej. overlay de rango). */
 function SyncAndCelebrationLayer({ children }) {
@@ -31,7 +46,6 @@ function SyncAndCelebrationLayer({ children }) {
           onContinue={advanceAfterCelebration}
         />
       ) : null}
-      <DevStepSkipBanner />
       {children}
     </>
   )
@@ -42,17 +56,19 @@ function AppRoutes() {
     <SyncAndCelebrationLayer>
       <div className="min-h-screen">
         <PlayfulBackdrop />
-        <Routes>
-          <Route path="/" element={<WelcomePage />} />
-          <Route path="/teoria" element={<TheoryPage />} />
-          <Route path="/teoria/ficha/:topicId" element={<TheoryFichaPage />} />
-          <Route path="/sops" element={<SopsPage />} />
-          <Route path="/sops/:sopId" element={<SopDetailPage />} />
-          <Route path="/procedimientos" element={<SopsPage />} />
-          <Route path="/procedimientos/:sopId" element={<SopDetailPage />} />
-          <Route path="/minijuegos" element={<GamesPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <Suspense fallback={<RouteFallback />}>
+          <Routes>
+            <Route path="/" element={<WelcomePage />} />
+            <Route path="/teoria" element={<TheoryPage />} />
+            <Route path="/teoria/ficha/:topicId" element={<TheoryFichaPage />} />
+            <Route path="/sops" element={<SopsPage />} />
+            <Route path="/sops/:sopId" element={<SopDetailPage />} />
+            <Route path="/procedimientos" element={<Navigate to="/sops" replace />} />
+            <Route path="/procedimientos/:sopId" element={<ProcedimientosToSopRedirect />} />
+            <Route path="/minijuegos" element={<GamesPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
       </div>
     </SyncAndCelebrationLayer>
   )

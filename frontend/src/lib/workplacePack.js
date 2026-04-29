@@ -28,7 +28,65 @@ import {
   trueFalseImcontent,
   trueFalseImmedia,
 } from '../data/workplaceMiniVariants'
+import {
+  SCENARIO_PTS_PER_ROUND,
+  MEMORY_PTS_PER_PAIR,
+  WORDLE_MAX,
+  WHO_ASK_PTS,
+  scenarioGeneral,
+  scenarioImmoralia,
+  scenarioImcontent,
+  scenarioImmedia,
+  memoryGeneral,
+  memoryImmoralia,
+  memoryImcontent,
+  memoryImmedia,
+  wordleGeneral,
+  wordleImmoralia,
+  wordleImcontent,
+  wordleImmedia,
+  whoAskGeneral,
+  whoAskImmoralia,
+  whoAskImcontent,
+  whoAskImmedia,
+} from '../data/workplaceMiniNewFour'
 import { normalizeWorkplaceId } from '../data/workplace'
+
+/** @param {string} wp */
+export function getScenarioRounds(wp) {
+  const w = normalizeWorkplaceId(wp)
+  if (w === 'immoralia') return scenarioImmoralia
+  if (w === 'general') return scenarioGeneral
+  if (w === 'immedia') return scenarioImmedia
+  return scenarioImcontent
+}
+
+/** @param {string} wp */
+export function getMemoryPairs(wp) {
+  const w = normalizeWorkplaceId(wp)
+  if (w === 'immoralia') return memoryImmoralia
+  if (w === 'general') return memoryGeneral
+  if (w === 'immedia') return memoryImmedia
+  return memoryImcontent
+}
+
+/** @param {string} wp */
+export function getWordleConfig(wp) {
+  const w = normalizeWorkplaceId(wp)
+  if (w === 'immoralia') return wordleImmoralia
+  if (w === 'general') return wordleGeneral
+  if (w === 'immedia') return wordleImmedia
+  return wordleImcontent
+}
+
+/** @param {string} wp */
+export function getWhoAskRounds(wp) {
+  const w = normalizeWorkplaceId(wp)
+  if (w === 'immoralia') return whoAskImmoralia
+  if (w === 'general') return whoAskGeneral
+  if (w === 'immedia') return whoAskImmedia
+  return whoAskImcontent
+}
 
 const PUZZLE_MAX = 50
 const VALORES_MAX = 10 * preguntasMiniValores.length
@@ -127,6 +185,9 @@ export function getMaxByModuleForWorkplace(workplace) {
   const pairs = getParesHerramienta(wp)
   const scr = getPalabrasRevueltas(wp)
   const odd = getPreguntasIntruso(wp)
+  const scenario = getScenarioRounds(wp)
+  const memory = getMemoryPairs(wp)
+  const whoAsk = getWhoAskRounds(wp)
 
   return {
     registros: getMaxModulo1Registros(wp),
@@ -137,5 +198,9 @@ export function getMaxByModuleForWorkplace(workplace) {
     miniMatch: pairs.length * 10,
     miniScramble: scr.length * 10,
     miniOdd: odd.length * 10,
+    miniScenario: scenario.length * SCENARIO_PTS_PER_ROUND,
+    miniMemory: memory.length * MEMORY_PTS_PER_PAIR,
+    miniWordle: WORDLE_MAX,
+    miniWhoToAsk: whoAsk.length * WHO_ASK_PTS,
   }
 }

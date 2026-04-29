@@ -1,11 +1,11 @@
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { useOnboarding } from '../context/OnboardingContext'
 import { getGroupLabel, getSopById, normalizeVideoEmbedUrl } from '../data/sops'
-import { useSopsBasePath } from '../hooks/useSopsBasePath'
+
+const SOPS_BASE_PATH = '/sops'
 
 function SopDetailPage() {
   const { userName } = useOnboarding()
-  const sopsBase = useSopsBasePath()
   const { sopId } = useParams()
   const sop = sopId ? getSopById(sopId) : undefined
 
@@ -14,7 +14,7 @@ function SopDetailPage() {
   }
 
   if (!sop) {
-    return <Navigate to={sopsBase} replace />
+    return <Navigate to={SOPS_BASE_PATH} replace />
   }
 
   const embed = normalizeVideoEmbedUrl(sop.videoEmbedUrl)
@@ -23,7 +23,7 @@ function SopDetailPage() {
     <div className="min-h-screen bg-slate-950/80 px-4 py-8 text-slate-200 md:px-6 md:py-12">
       <div className="playful-card-ring mx-auto max-w-3xl rounded-3xl border border-cyan-500/15 bg-slate-950/45 px-4 py-8 backdrop-blur-sm md:px-8 md:py-10">
         <nav className="mb-6 flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500 md:text-sm">
-          <Link to={sopsBase} className="text-cyan-400/90 hover:text-cyan-300 hover:underline">
+          <Link to={SOPS_BASE_PATH} className="text-cyan-400/90 hover:text-cyan-300 hover:underline">
             SOPs
           </Link>
           <span className="text-slate-600" aria-hidden>
@@ -88,7 +88,7 @@ function SopDetailPage() {
         ) : null}
 
         <div className="mt-12 border-t border-slate-800/80 pt-6">
-          <Link to={sopsBase} className="text-sm font-semibold text-cyan-400/90 hover:text-cyan-300 hover:underline md:text-base">
+          <Link to={SOPS_BASE_PATH} className="text-sm font-semibold text-cyan-400/90 hover:text-cyan-300 hover:underline md:text-base">
             Volver al listado
           </Link>
         </div>

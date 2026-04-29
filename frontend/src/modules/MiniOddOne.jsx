@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import ModuleWrapper from '../components/ModuleWrapper'
+import { getOddOneExplanation } from '../lib/questionExplain'
 import { MINI_POINTS, preguntasIntruso as defaultIntruso } from '../data/minijuegos'
 
 function MiniOddOne({ onComplete, questions = defaultIntruso }) {
@@ -64,9 +65,12 @@ function MiniOddOne({ onComplete, questions = defaultIntruso }) {
           })}
         </div>
         {answered ? (
-          <p className={`mt-3 text-sm font-semibold ${correct ? 'text-emerald-300' : 'text-rose-300'}`}>
-            {correct ? `+${MINI_POINTS.oddPerHit} pts` : 'Ese no era el intruso.'}
-          </p>
+          <div className="mt-3 space-y-2 rounded-xl border border-slate-600/50 bg-slate-900/60 p-3 text-sm leading-relaxed">
+            <p className={`font-semibold ${correct ? 'text-emerald-300' : 'text-rose-300'}`}>
+              {correct ? `+${MINI_POINTS.oddPerHit} pts` : '0 pts'}
+            </p>
+            <p className="text-slate-300">{getOddOneExplanation(q, picked, correct)}</p>
+          </div>
         ) : null}
       </div>
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

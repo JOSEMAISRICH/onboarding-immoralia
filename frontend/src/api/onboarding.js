@@ -62,36 +62,6 @@ export async function getOnboardingProgress() {
 }
 
 /**
- * @param {{ stepIndex: number, userName: string, startedAt: number | null, scoreByModule: Record<string, number> }} payload
- */
-export async function putOnboardingProgress(payload) {
-  const base = getBaseUrl()
-  if (!base) return { ok: false, message: 'VITE_API_URL no configurada' }
-  try {
-    const body = JSON.stringify({
-      stepIndex: payload.stepIndex,
-      userName: payload.userName,
-      startedAt: payload.startedAt,
-      scoreByModule: payload.scoreByModule,
-      schemaVersion: ONBOARDING_SCHEMA_VERSION,
-    })
-    const res = await fetch(`${base}/api/onboarding/progress`, {
-      method: 'PUT',
-      headers: authHeaders(),
-      body,
-    })
-    if (!res.ok) {
-      const text = await res.text()
-      return { ok: false, status: res.status, message: text || res.statusText }
-    }
-    return { ok: true }
-  } catch (e) {
-    const err = /** @type {Error} */ (e)
-    return { ok: false, networkError: true, message: err.message }
-  }
-}
-
-/**
  * @param {Partial<{ stepIndex: number, userName: string, workplace: string, startedAt: number | null, scoreByModule: Record<string, number>, schemaVersion: number }>} patch
  */
 export async function patchOnboardingProgress(patch) {

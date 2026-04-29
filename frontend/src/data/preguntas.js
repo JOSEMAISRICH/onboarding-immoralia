@@ -10,6 +10,8 @@ export const preguntas = [
       'Reducir la comunicacion con el cliente al minimo',
     ],
     correctAnswer: 1,
+    explanation:
+      'La vision busca que el marketing sea fuerza de cambio etico y con proposito, no solo ruido o premios de diseno sin impacto.',
   },
   {
     id: 2,
@@ -21,12 +23,16 @@ export const preguntas = [
       'Agencia que evita la automatizacion',
     ],
     correctAnswer: 1,
+    explanation:
+      'La mision nos presenta como puente entre marcas y cambio con estrategia etica y efectiva; no como meros ejecutores.',
   },
   {
     id: 3,
     question: 'Cual de estos es uno de los cuatro valores del manifiesto?',
     options: ['Servicio', 'Excelencia', 'Proposito compartido', 'Ejecucion agil'],
     correctAnswer: 0,
+    explanation:
+      'Los cuatro valores del manifiesto incluyen Servicio, Transparencia, Innovacion y Resultados; Servicio es uno de ellos.',
   },
   {
     id: 4,
@@ -38,6 +44,8 @@ export const preguntas = [
       'Como usuarios anonimos',
     ],
     correctAnswer: 1,
+    explanation:
+      'Tratamos a los clientes como aliados estrategicos: relacion de largo plazo basada en confianza y resultados compartidos.',
   },
   {
     id: 5,
@@ -49,6 +57,8 @@ export const preguntas = [
       'Preguntar sin haber buscado antes en la documentacion',
     ],
     correctAnswer: 0,
+    explanation:
+      'Los estandares insisten en priorizar al cliente y cumplir compromisos; la documentacion y la preparacion vienen antes que improvisar.',
   },
   {
     id: 6,
@@ -61,6 +71,8 @@ export const preguntas = [
       'Informar solo al final del proyecto',
     ],
     correctAnswer: 1,
+    explanation:
+      'Registrar acuerdos y compartirlos evita malentendidos; la informacion no debe depender solo de la memoria informal.',
   },
   {
     id: 7,
@@ -73,6 +85,8 @@ export const preguntas = [
       'En la siguiente reunion fijada, aunque sea una semana despues',
     ],
     correctAnswer: 1,
+    explanation:
+      'La norma operativa exige responder mensajes de clientes en menos de una hora en horario laboral.',
   },
   {
     id: 8,
@@ -84,6 +98,8 @@ export const preguntas = [
       'Asumir que el equipo ya lo sabe',
     ],
     correctAnswer: 1,
+    explanation:
+      'Si un plazo o objetivo corre riesgo, se espera aviso temprano para replanificar con transparencia.',
   },
   {
     id: 9,
@@ -95,6 +111,8 @@ export const preguntas = [
       'Gestionar solo el branding externo',
     ],
     correctAnswer: 1,
+    explanation:
+      'El CFO cubre estrategia financiera, presupuesto, rentabilidad y reporting hacia el liderazgo.',
   },
   {
     id: 10,
@@ -106,6 +124,8 @@ export const preguntas = [
       'Definir salarios sin coordinar con nadie',
     ],
     correctAnswer: 1,
+    explanation:
+      'El CSO valida propuestas comerciales antes de enviarlas; cuida viabilidad, margen y estandares.',
   },
   {
     id: 11,
@@ -117,6 +137,8 @@ export const preguntas = [
       'Disenar solo creatividades finales',
     ],
     correctAnswer: 1,
+    explanation:
+      'People se centra en talento, seleccion, onboarding, Growth Meets y experiencia de equipo.',
   },
   {
     id: 12,
@@ -128,6 +150,8 @@ export const preguntas = [
       'Organizar documentacion contable',
     ],
     correctAnswer: 1,
+    explanation:
+      'Administracion gestiona facturacion y cobros; negociar precios con clientes corresponde a otros roles (comercial / direccion).',
   },
   {
     id: 13,
@@ -139,6 +163,8 @@ export const preguntas = [
       'Sustituto del cliente en las reuniones',
     ],
     correctAnswer: 1,
+    explanation:
+      'El COO impulsa procesos, eficiencia, alineacion interna y quita fricciones operativas.',
   },
   {
     id: 14,
@@ -151,6 +177,8 @@ export const preguntas = [
       'Solo redes sociales del cliente',
     ],
     correctAnswer: 1,
+    explanation:
+      'El COO mira rentabilidad y carga desde la operacion: horas, calidad de entrega y sostenibilidad interna.',
   },
   {
     id: 15,
@@ -162,6 +190,8 @@ export const preguntas = [
       'Sin relacion con clientes en ningun caso',
     ],
     correctAnswer: 1,
+    explanation:
+      'El Head de immedia es referente estrategico: cuentas, resultados, vision del servicio y direccion del equipo.',
   },
   {
     id: 16,
@@ -173,6 +203,8 @@ export const preguntas = [
       'Cerrar contratos legales sin CSO',
     ],
     correctAnswer: 1,
+    explanation:
+      'El especialista ejecuta y optimiza en plataformas (Meta, Google, TikTok, etc.) con foco en rendimiento.',
   },
   {
     id: 17,
@@ -184,6 +216,8 @@ export const preguntas = [
       'Sustituir al CFO en reporting financiero',
     ],
     correctAnswer: 0,
+    explanation:
+      'El Head de imcontent lidera vision creativa, contenido y redes, coordinando un equipo multidisciplinar.',
   },
   {
     id: 18,
@@ -195,6 +229,8 @@ export const preguntas = [
       'Gestionar contratos con influencers sin coordinar',
     ],
     correctAnswer: 1,
+    explanation:
+      'El disenador senior ejecuta piezas de alto impacto y marca; no suele liderar todo el equipo de diseno.',
   },
   {
     id: 19,
@@ -206,6 +242,8 @@ export const preguntas = [
       'Sustituir al copy en todos los guiones sin revision',
     ],
     correctAnswer: 1,
+    explanation:
+      'Video/motion crea y edita piezas audiovisuales alineadas al brief y al rendimiento por canal.',
   },
   {
     id: 20,
@@ -217,6 +255,8 @@ export const preguntas = [
       'Eliminar toda documentacion interna',
     ],
     correctAnswer: 1,
+    explanation:
+      'El Head de Immoralia impulsa automatizacion, IA etica, stack tecnico y formacion al equipo.',
   },
   {
     id: 21,
@@ -228,6 +268,8 @@ export const preguntas = [
       'Colabora con heads y cuentas para soluciones a clientes',
     ],
     correctAnswer: 1,
+    explanation:
+      'Definir prioridades estrategicas del area sin el Head no corresponde al especialista; el Head marca la direccion.',
   },
   {
     id: 22,
@@ -239,6 +281,8 @@ export const preguntas = [
       'Pedir a un companero que fichaje por ti ese dia',
     ],
     correctAnswer: 1,
+    explanation:
+      'Ante errores de fichaje: avisar al responsable y seguir el formulario/canal oficial en Slack.',
   },
   {
     id: 23,
@@ -250,6 +294,8 @@ export const preguntas = [
       'Marcar tareas como "en pausa" sin responsable de cobertura',
     ],
     correctAnswer: 1,
+    explanation:
+      'Antes de vacaciones: delegar continuidad, estado en Slack y respuesta automatica OOO en email.',
   },
   {
     id: 24,
@@ -261,6 +307,8 @@ export const preguntas = [
       'No hace falta sumar el calendario a favoritos',
     ],
     correctAnswer: 1,
+    explanation:
+      'Si falta un festivo relevante en el calendario compartido, conviene avisar al responsable con tiempo.',
   },
   {
     id: 25,
@@ -273,6 +321,8 @@ export const preguntas = [
       'Puntos solo si ignoras cuentas con mal resultado',
     ],
     correctAnswer: 1,
+    explanation:
+      'Los incentivos por cuenta se amarran a objetivos mensuales, roles y documentacion en directorio/hoja segun area.',
   },
   {
     id: 26,
@@ -285,6 +335,8 @@ export const preguntas = [
       'Analizar rendimiento y proponer mejoras',
     ],
     correctAnswer: 1,
+    explanation:
+      'La inversion final y el presupuesto los marca la direccion o estrategia; el especialista no decide solo.',
   },
   {
     id: 27,
@@ -292,6 +344,8 @@ export const preguntas = [
       'Programa de recomendaciones (referidos): la recompensa habitual sobre facturacion del cliente, cuando aplica el acuerdo, es del:',
     options: ['1% unico', '10% el primer ano', '50% siempre', '0%: no existe programa'],
     correctAnswer: 1,
+    explanation:
+      'En el esquema de referidos descrito, la recompensa suele ser un porcentaje de la facturacion el primer ano (p. ej. 10%) cuando aplica el acuerdo.',
   },
   {
     id: 28,
@@ -303,6 +357,8 @@ export const preguntas = [
       'Coordinar la propuesta economica directamente con el lead antes de avisar a captacion',
     ],
     correctAnswer: 1,
+    explanation:
+      'Los leads se canalizan con herramientas de primera llamada, avisando al lider y dejando que captacion cierre con proceso.',
   },
   {
     id: 29,
@@ -314,6 +370,8 @@ export const preguntas = [
       'Nunca: es solo simbolico',
     ],
     correctAnswer: 1,
+    explanation:
+      'La recompensa por referido suele empezar a contar tras el cobro de la primera factura del nuevo cliente, si el acuerdo aplica.',
   },
   {
     id: 30,
@@ -325,6 +383,8 @@ export const preguntas = [
       'Solo si la cuenta no tenia KPIs definidos al inicio del mes',
     ],
     correctAnswer: 1,
+    explanation:
+      'El resultado global de una cuenta puede arrastrar el incentivo total aunque otras cuentas hayan ido bien.',
   },
   {
     id: 31,
@@ -337,6 +397,8 @@ export const preguntas = [
       'Solo la valoracion subjetiva del cliente en encuesta trimestral',
     ],
     correctAnswer: 1,
+    explanation:
+      'El reparto suele ponderar las horas trabajadas en la cuenta: mas horas de impacto, mas parte proporcional.',
   },
   {
     id: 32,
@@ -348,6 +410,8 @@ export const preguntas = [
       'No hace falta documentar formacion',
     ],
     correctAnswer: 1,
+    explanation:
+      'Los hallazgos utiles van al canal indicado en Slack y la formacion se registra en ClickUp en el bloque correspondiente.',
   },
   {
     id: 33,
@@ -360,6 +424,8 @@ export const preguntas = [
       'Nunca marcar ausencia aunque estes en reunion',
     ],
     correctAnswer: 1,
+    explanation:
+      'Estado en Slack y bloques de comida en calendario ayudan a coordinarnos; respetar estados ajenos es parte del acuerdo.',
   },
   {
     id: 34,
@@ -371,12 +437,16 @@ export const preguntas = [
       'Solo el equipo de Administracion',
     ],
     correctAnswer: 1,
+    explanation:
+      'El Growth Meet mensual habitual ocurre entre Team Leader y Account Manager.',
   },
   {
     id: 35,
     question: 'El Growth Meet trimestral incluye a:',
     options: ['Solo freelancers', 'CEO junto al flujo de Team Leader / Account Manager', 'Nadie del equipo', 'Solo proveedores'],
     correctAnswer: 1,
+    explanation:
+      'El Growth Meet trimestral incluye al CEO junto al flujo Team Leader / Account Manager.',
   },
   {
     id: 36,
@@ -389,6 +459,8 @@ export const preguntas = [
       'No hace falta guardar nada en ClickUp',
     ],
     correctAnswer: 1,
+    explanation:
+      'La plantilla guia tiempos: AM completa formulario con antelacion, revision TL/CEO y tarea conjunta el dia del meet.',
   },
   {
     id: 37,
@@ -400,6 +472,8 @@ export const preguntas = [
       'Anula el plan de incentivos para siempre sin proceso',
     ],
     correctAnswer: 1,
+    explanation:
+      'La tercera tarjeta amarilla en el sistema de avisos puede llevar a la terminacion del contrato.',
   },
   {
     id: 38,
@@ -411,6 +485,8 @@ export const preguntas = [
       'Apelar unicamente en el Growth Meet trimestral sin escrito previo',
     ],
     correctAnswer: 1,
+    explanation:
+      'La apelacion formal va por email a CEO y COO con documentacion; despues hay llamada de resolucion.',
   },
   {
     id: 39,
@@ -422,6 +498,8 @@ export const preguntas = [
       'Solo si cambias de departamento al dia siguiente',
     ],
     correctAnswer: 1,
+    explanation:
+      'Sin nuevas desviaciones de esa regla durante un ano, la tarjeta amarilla puede prescribir.',
   },
   {
     id: 40,
@@ -433,6 +511,8 @@ export const preguntas = [
       'Cuentan como tiempo facturable obligatorio en todas las cuentas',
     ],
     correctAnswer: 1,
+    explanation:
+      'Team Coffee Meets son quincenales (viernes 13h Spain), voluntarios, con calendario y recordatorios en Slack.',
   },
   {
     id: 41,
@@ -444,6 +524,8 @@ export const preguntas = [
       'Solo clientes externos presentan',
     ],
     correctAnswer: 1,
+    explanation:
+      'Team Meets Paid son semanales los miercoles con responsable rotativo y temas propuestos en Slack.',
   },
   {
     id: 42,
@@ -455,6 +537,8 @@ export const preguntas = [
       'Solo avisar si supera 50.000 EUR',
     ],
     correctAnswer: 1,
+    explanation:
+      'Los gastos con fondos de empresa requieren aprobacion previa por el canal definido (Operaciones/Slack o email segun caso).',
   },
   {
     id: 43,
@@ -466,6 +550,8 @@ export const preguntas = [
       'A la marca comercial visible en factura aunque no sea la SLU de Immoral',
     ],
     correctAnswer: 1,
+    explanation:
+      'Los recibos deben ir a nombre de la empresa (p. ej. ADVERTISING MARKETING TEAM SLU) segun politica interna.',
   },
   {
     id: 44,
@@ -477,5 +563,7 @@ export const preguntas = [
       'Rellenar solo una vez al salir de la empresa',
     ],
     correctAnswer: 1,
+    explanation:
+      'Se espera feedback concreto y propuesta de mejora en las fichas; Operaciones revisa con periodicidad definida.',
   },
 ]

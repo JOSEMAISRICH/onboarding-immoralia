@@ -4,8 +4,7 @@
  * Paleta mas alegre: calidos + cielo (evitar gris plata frio).
  */
 import { EXTRA_GAME_KEYS } from '../data/extraMinijuegos10'
-
-const EXTRA_START_STEP = 9
+import { EXTRA_START_STEP } from './onboardingSteps'
 
 /** Ultimo stepIndex del onboarding (pantalla Finish). Debe coincidir con App.jsx */
 export function getFinishStepIndex() {

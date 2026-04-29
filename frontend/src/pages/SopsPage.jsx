@@ -1,11 +1,11 @@
 import { Link, Navigate } from 'react-router-dom'
 import { useOnboarding } from '../context/OnboardingContext'
 import { SOP_GROUPS, SOPS } from '../data/sops'
-import { useSopsBasePath } from '../hooks/useSopsBasePath'
+
+const SOPS_BASE_PATH = '/sops'
 
 function SopsPage() {
   const { userName } = useOnboarding()
-  const sopsBase = useSopsBasePath()
 
   if (!userName) {
     return <Navigate to="/" replace />
@@ -46,7 +46,7 @@ function SopsPage() {
                   {items.map((sop) => (
                     <li key={sop.id}>
                       <Link
-                        to={`${sopsBase}/${sop.id}`}
+                        to={`${SOPS_BASE_PATH}/${sop.id}`}
                         className="group flex items-center justify-between gap-3 rounded-xl border border-slate-700/80 bg-slate-950/60 px-4 py-4 text-left transition hover:border-cyan-500/40 hover:bg-slate-950/90 md:px-5 md:py-4"
                       >
                         <span className="text-base font-semibold leading-snug text-slate-100 group-hover:text-white md:text-lg">
@@ -63,12 +63,6 @@ function SopsPage() {
             )
           })}
         </div>
-
-        <footer className="mt-12 border-t border-slate-800/80 pt-6 text-center">
-          <p className="text-xs leading-relaxed text-slate-500 md:text-sm">
-            Prototipo: se pueden anadir mas SOPs y enlaces en datos o backend mas adelante.
-          </p>
-        </footer>
       </div>
     </div>
   )

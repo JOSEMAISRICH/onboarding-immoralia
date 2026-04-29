@@ -2,7 +2,7 @@ import { EXTRA_GAME_KEYS } from '../data/extraMinijuegos10'
 import { normalizeWorkplaceId } from '../data/workplace'
 
 /** Debe coincidir con progressStorage (v) y con schemaVersion del API. */
-export const ONBOARDING_SCHEMA_VERSION = 11
+export const ONBOARDING_SCHEMA_VERSION = 12
 
 export function emptyScores() {
   const extras = Object.fromEntries(EXTRA_GAME_KEYS.map((k) => [k, 0]))
@@ -15,6 +15,10 @@ export function emptyScores() {
     miniMatch: 0,
     miniScramble: 0,
     miniOdd: 0,
+    miniScenario: 0,
+    miniMemory: 0,
+    miniWordle: 0,
+    miniWhoToAsk: 0,
     ...extras,
   }
 }

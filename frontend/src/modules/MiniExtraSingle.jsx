@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import ModuleWrapper from '../components/ModuleWrapper'
+import { getQuestionExplanation, getTrueFalseExplanation } from '../lib/questionExplain'
 import { EXTRA_POINTS_EACH, extraGames } from '../data/extraMinijuegos10'
 
 function MiniExtraSingle({ gameIndex, onComplete }) {
@@ -107,9 +108,26 @@ function MiniExtraSingle({ gameIndex, onComplete }) {
         ) : null}
 
         {answered ? (
-          <p className={`mt-3 text-sm font-semibold ${isCorrect ? 'text-emerald-300' : 'text-rose-300'}`}>
-            {isCorrect ? `+${EXTRA_POINTS_EACH} pts` : '0 pts en este extra — sigue adelante.'}
-          </p>
+          <div className="mt-3 space-y-2 rounded-xl border border-slate-600/50 bg-slate-900/60 p-3 text-sm leading-relaxed">
+            <p className={`font-semibold ${isCorrect ? 'text-emerald-300' : 'text-rose-300'}`}>
+              {isCorrect ? `+${EXTRA_POINTS_EACH} pts` : '0 pts en este extra — sigue adelante.'}
+            </p>
+            <p className="text-slate-300">
+              {isMcq
+                ? getQuestionExplanation(
+                    {
+                      options: game.options,
+                      correctIndex: game.correctIndex,
+                      explanation: game.explanation,
+                    },
+                    isCorrect,
+                  )
+                : getTrueFalseExplanation(
+                    { text: game.question, correct: game.correct, explanation: game.explanation },
+                    isCorrect,
+                  )}
+            </p>
+          </div>
         ) : null}
       </div>
 

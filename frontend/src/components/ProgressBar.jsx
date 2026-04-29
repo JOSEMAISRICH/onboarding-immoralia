@@ -1,4 +1,4 @@
-import { isApiConfigured } from '../api/onboarding'
+import { Link } from 'react-router-dom'
 import JourneyRing from './JourneyRing'
 import {
   getJourneyTier,
@@ -16,7 +16,9 @@ function ProgressBar({
   showRestart = false,
   onRestart,
   streakDays = 0,
-  /** URL absoluta a la pagina solo-teoria (nueva pestana) */
+  /** Ruta interna (SPA) a la biblioteca de teoría; preferir a `theoryUrl`. */
+  theoryTo,
+  /** URL absoluta a solo-teoría (nueva pestaña); solo si no usas `theoryTo`. */
   theoryUrl,
   /** Texto del enlace; por defecto indica el espacio si pasas workplaceLabel */
   theoryLinkLabel = 'Teoria (otra pagina)',
@@ -37,26 +39,20 @@ function ProgressBar({
           </p>
           <p className="text-xs font-medium text-amber-100/75 md:text-sm">
             Paso {currentStep} de {totalSteps}
-            {' · '}
-            <span
-              className={
-                isApiConfigured()
-                  ? 'rounded px-1.5 py-0.5 font-medium text-lime-300'
-                  : 'rounded px-1.5 py-0.5 font-medium text-slate-500'
-              }
-              title={
-                isApiConfigured()
-                  ? 'VITE_API_URL definida: sincronizacion con backend activa'
-                  : 'Sin VITE_API_URL: solo localStorage. Copia .env.example a .env y reinicia npm run dev'
-              }
-            >
-              API: {isApiConfigured() ? 'sí' : 'no'}
-            </span>
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 text-sm text-amber-50/95 md:text-base">
-          {theoryUrl ? (
+          {theoryTo ? (
+            <Link
+              to={theoryTo}
+              className="inline-flex items-center gap-1.5 rounded-full border border-violet-400/40 bg-violet-500/15 px-3 py-1 text-xs font-semibold text-violet-100 shadow-sm shadow-violet-900/20 transition hover:bg-violet-500/25 hover:brightness-105"
+              title="Volver a la biblioteca de teoria de tu espacio"
+            >
+              <span aria-hidden>📚</span>
+              {theoryLinkLabel}
+            </Link>
+          ) : theoryUrl ? (
             <a
               href={theoryUrl}
               target="_blank"

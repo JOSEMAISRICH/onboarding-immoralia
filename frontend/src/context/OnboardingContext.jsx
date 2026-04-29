@@ -13,6 +13,7 @@ import { getStreakState, recordVisitToday } from '../lib/learningStreak'
 import { emptyScores, normalizeProgress } from '../lib/onboardingDefaults'
 import { FINISH_STEP } from '../lib/onboardingSteps'
 import { clearProgress, loadProgress, saveProgress } from '../lib/progressStorage'
+import { getStepIndexForModuleKey } from '../lib/moduleStepMap'
 import { getMaxByModuleForWorkplace } from '../lib/workplacePack'
 
 function readLocalProgressState() {
@@ -55,6 +56,22 @@ export function OnboardingProvider({ children }) {
   )
 
   const syncDebounceRef = useRef(null)
+  const replayReturnStepRef = useRef(/** @type {number | null} */ (null))
+
+  const [remoteContent, setRemoteContent] = useState(/** @type {unknown} */ (null))
+
+  useEffect(() => {
+    let cancelled = false
+    import('../lib/loadContentJson')
+      .then(({ fetchOptionalContentJson }) => fetchOptionalContentJson())
+      .then((data) => {
+        if (!cancelled && data) setRemoteContent(data)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     if (!apiOn) return
@@ -185,6 +202,13 @@ export function OnboardingProvider({ children }) {
 
   const completeModuleWithScore = useCallback((updateScore) => {
     updateScore()
+    const returnTo = replayReturnStepRef.current
+    if (returnTo !== null) {
+      replayReturnStepRef.current = null
+      setPendingCelebration(null)
+      setStepIndex(returnTo)
+      return
+    }
     setStepIndex((prev) => {
       const tierBefore = getTierIdForStep(prev)
       const tierAfter = getTierIdForStep(prev + 1)
@@ -198,6 +222,24 @@ export function OnboardingProvider({ children }) {
     })
   }, [])
 
+  const recordModuleScore = useCallback((moduleKey, earned) => {
+    const e = Number(earned) || 0
+    setScoreByModule((s) => {
+      if (replayReturnStepRef.current !== null) {
+        return { ...s, [moduleKey]: Math.max(Number(s[moduleKey]) || 0, e) }
+      }
+      return { ...s, [moduleKey]: e }
+    })
+  }, [])
+
+  const beginReplayModule = useCallback((moduleKey) => {
+    const step = getStepIndexForModuleKey(moduleKey)
+    if (step == null) return
+    replayReturnStepRef.current = FINISH_STEP
+    setPendingCelebration(null)
+    setStepIndex(step)
+  }, [])
+
   const handleReset = useCallback(async () => {
     if (apiOn) {
       await deleteOnboardingProgress()
@@ -209,6 +251,7 @@ export function OnboardingProvider({ children }) {
     setStartedAt(null)
     setScoreByModule(emptyScores())
     setPendingCelebration(null)
+    replayReturnStepRef.current = null
     setSyncError(false)
   }, [apiOn])
 
@@ -224,6 +267,7 @@ export function OnboardingProvider({ children }) {
           setSyncError(false)
         }
       }
+      replayReturnStepRef.current = null
       setUserName(name)
       setWorkplace(wp)
       setStartedAt(Date.now())
@@ -235,12 +279,6 @@ export function OnboardingProvider({ children }) {
 
   const beginMinijuegos = useCallback(() => {
     setStepIndex(1)
-  }, [])
-
-  /** Temporal (dev): avanza un paso sin jugar; quitar antes de produccion. */
-  const skipStepDev = useCallback(() => {
-    setPendingCelebration(null)
-    setStepIndex((i) => Math.min(i + 1, FINISH_STEP))
   }, [])
 
   const value = useMemo(
@@ -255,13 +293,15 @@ export function OnboardingProvider({ children }) {
       startedAt,
       scoreByModule,
       setScoreByModule,
+      recordModuleScore,
+      beginReplayModule,
+      remoteContent,
       pendingCelebration,
       advanceAfterCelebration,
       completeModuleWithScore,
       handleReset,
       handleWelcomeSubmit,
       beginMinijuegos,
-      skipStepDev,
       maxByModule,
       maxPoints,
       totalPoints,
@@ -279,13 +319,16 @@ export function OnboardingProvider({ children }) {
       workplace,
       startedAt,
       scoreByModule,
+      setScoreByModule,
+      recordModuleScore,
+      beginReplayModule,
+      remoteContent,
       pendingCelebration,
       advanceAfterCelebration,
       completeModuleWithScore,
       handleReset,
       handleWelcomeSubmit,
       beginMinijuegos,
-      skipStepDev,
       maxByModule,
       maxPoints,
       totalPoints,

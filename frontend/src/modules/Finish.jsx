@@ -11,6 +11,10 @@ const baseLabels = {
   miniMatch: 'Minijuego: Empareja rol',
   miniScramble: 'Minijuego: Palabra revuelta',
   miniOdd: 'Minijuego: El intruso',
+  miniScenario: 'Minijuego: Escenarios',
+  miniMemory: 'Minijuego: Memoria',
+  miniWordle: 'Minijuego: Palabra oculta',
+  miniWhoToAsk: 'Minijuego: A quien consultar',
 }
 
 const extraLabels = Object.fromEntries(extraGames.map((g) => [g.key, g.listTitle]))
@@ -35,6 +39,7 @@ function Finish({
   maxByModule,
   startedAt,
   onReset,
+  beginReplayModule,
 }) {
   const percentScore = maxPoints === 0 ? 0 : Math.round((totalPoints / maxPoints) * 100)
   const perfectScore = totalPoints >= maxPoints
@@ -121,12 +126,23 @@ function Finish({
           {moduleKeys.map((key) => (
             <li
               key={key}
-              className="flex justify-between gap-2 border-b border-slate-700/50 pb-2 last:border-0"
+              className="flex flex-col gap-2 border-b border-slate-700/50 pb-2 last:border-0 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3"
             >
-              <span>{labels[key] || key}</span>
-              <span className="shrink-0 font-mono text-cyan-100">
-                {scoreByModule[key] ?? 0} / {maxByModule[key]} pts
-              </span>
+              <span className="min-w-0 flex-1">{labels[key] || key}</span>
+              <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
+                <span className="font-mono text-cyan-100">
+                  {scoreByModule[key] ?? 0} / {maxByModule[key]} pts
+                </span>
+                {beginReplayModule ? (
+                  <button
+                    type="button"
+                    className="rounded-lg border border-violet-400/45 bg-violet-950/40 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-violet-100 transition hover:bg-violet-900/50"
+                    onClick={() => beginReplayModule(key)}
+                  >
+                    Mejorar mi puntuacion
+                  </button>
+                ) : null}
+              </div>
             </li>
           ))}
         </ul>

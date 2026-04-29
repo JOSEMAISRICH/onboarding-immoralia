@@ -8,9 +8,12 @@ const VIBES = [
 ]
 
 /**
- * @param {{ unit: { title: string, objective: string, minutes: number, emoji: string } | undefined }} props
+ * @param {{
+ *   unit: { title: string, objective: string, minutes: number, emoji: string } | undefined
+ *   pointsCap?: number | null
+ * }} props
  */
-function CurrentLessonBanner({ unit }) {
+function CurrentLessonBanner({ unit, pointsCap }) {
   const vibe = useMemo(() => {
     if (!unit) return VIBES[0]
     const i = (unit.title.length + unit.minutes * 7) % VIBES.length
@@ -29,7 +32,9 @@ function CurrentLessonBanner({ unit }) {
         <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-100">
           ~{unit.minutes} min
         </span>
-        <span className="ml-auto text-xs font-semibold text-fuchsia-200/90">+XP al completar</span>
+        {typeof pointsCap === 'number' && pointsCap > 0 ? (
+          <span className="ml-auto text-xs font-semibold text-fuchsia-200/90">Hasta {pointsCap} pts</span>
+        ) : null}
       </div>
       <p className="mt-2 text-xl font-bold leading-tight text-white md:text-2xl">{unit.title}</p>
       <p className="mt-2 text-base leading-relaxed text-cyan-100/90 md:text-lg">{unit.objective}</p>

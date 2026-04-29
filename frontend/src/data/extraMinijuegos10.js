@@ -35,6 +35,8 @@ export const extraGames = [
       'Como equipo que evita medir resultados',
     ],
     correctIndex: 1,
+    explanation:
+      'Queremos que las marcas nos vean como socio estrategico que empuja resultados eticos, no como mero proveedor externo.',
   },
   {
     key: 'extra02',
@@ -45,6 +47,8 @@ export const extraGames = [
     type: 'tf',
     question: 'Los cuatro valores del manifiesto incluyen Servicio y Transparencia.',
     correct: true,
+    explanation:
+      'Los cuatro valores oficiales son Servicio, Transparencia, Innovacion y Resultados; Servicio y Transparencia estan incluidos.',
   },
   {
     key: 'extra03',
