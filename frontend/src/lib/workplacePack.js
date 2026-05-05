@@ -7,12 +7,11 @@ import {
   preguntasIntruso as intrusoImmoralia,
   preguntasTrueFalse as trueFalseImmoralia,
 } from '../data/minijuegos'
-import { maxMiniHerramientasJuego } from '../data/miniHerramientasJuego'
 import { preguntas as quizImmoralia } from '../data/preguntas'
 import { preguntasMiniValores } from '../data/miniValoresJuego'
 import { pasosProceso as pasosGeneral } from '../data/pasosProceso'
 import { quizGeneral } from '../data/workplaceQuizGeneral'
-import { modulo1Imcontent, modulo1General, modulo1Immedia } from '../data/workplaceModulo1Repaso'
+import { modulo1Imcontent, modulo1General, modulo1Immoralia, modulo1Immedia } from '../data/workplaceModulo1Repaso'
 import { quizImcontent, quizImmedia } from '../data/workplaceQuizVertical'
 import {
   intrusoGeneral,
@@ -32,6 +31,7 @@ import {
   SCENARIO_PTS_PER_ROUND,
   MEMORY_PTS_PER_PAIR,
   WORDLE_MAX,
+  WORDLE_ROUNDS_PER_SESSION,
   WHO_ASK_PTS,
   scenarioGeneral,
   scenarioImmoralia,
@@ -41,16 +41,17 @@ import {
   memoryImmoralia,
   memoryImcontent,
   memoryImmedia,
-  wordleGeneral,
-  wordleImmoralia,
-  wordleImcontent,
-  wordleImmedia,
+  wordlePoolGeneral,
+  wordlePoolImmoralia,
+  wordlePoolImcontent,
+  wordlePoolImmedia,
   whoAskGeneral,
   whoAskImmoralia,
   whoAskImcontent,
   whoAskImmedia,
 } from '../data/workplaceMiniNewFour'
 import { normalizeWorkplaceId } from '../data/workplace'
+import { EXAM_CAPS } from './examQuestionCaps'
 
 /** @param {string} wp */
 export function getScenarioRounds(wp) {
@@ -70,13 +71,18 @@ export function getMemoryPairs(wp) {
   return memoryImcontent
 }
 
-/** @param {string} wp */
-export function getWordleConfig(wp) {
+/** Pool de palabras (5 letras); cada sesión del paso elige 3 al azar. */
+export function getWordlePool(wp) {
   const w = normalizeWorkplaceId(wp)
-  if (w === 'immoralia') return wordleImmoralia
-  if (w === 'general') return wordleGeneral
-  if (w === 'immedia') return wordleImmedia
-  return wordleImcontent
+  if (w === 'immoralia') return wordlePoolImmoralia
+  if (w === 'general') return wordlePoolGeneral
+  if (w === 'immedia') return wordlePoolImmedia
+  return wordlePoolImcontent
+}
+
+/** Primera entrada del pool (compat). */
+export function getWordleConfig(wp) {
+  return getWordlePool(wp)[0]
 }
 
 /** @param {string} wp */
@@ -159,9 +165,10 @@ export function getPasosProceso(wp) {
   ]
 }
 
-/** Modulo 1: solo para no-immoralia (lista de repasos cortos). */
+/** Modulo 1: micro-tests tipo examen para todos los espacios (lista en workplaceModulo1Repaso). */
 export function getModulo1RepasoItems(wp) {
   const w = normalizeWorkplaceId(wp)
+  if (w === 'immoralia') return modulo1Immoralia
   if (w === 'general') return modulo1General
   if (w === 'immedia') return modulo1Immedia
   if (w === 'imcontent') return modulo1Imcontent
@@ -169,9 +176,8 @@ export function getModulo1RepasoItems(wp) {
 }
 
 export function getMaxModulo1Registros(wp) {
-  const w = normalizeWorkplaceId(wp)
-  if (w === 'immoralia') return maxMiniHerramientasJuego
-  return getModulo1RepasoItems(w).length * 10
+  void wp
+  return EXAM_CAPS.modulo1 * 10
 }
 
 /**
@@ -180,27 +186,23 @@ export function getMaxModulo1Registros(wp) {
  */
 export function getMaxByModuleForWorkplace(workplace) {
   const wp = normalizeWorkplaceId(workplace)
-  const quiz = getQuizPreguntas(wp)
-  const tf = getPreguntasTrueFalse(wp)
   const pairs = getParesHerramienta(wp)
-  const scr = getPalabrasRevueltas(wp)
-  const odd = getPreguntasIntruso(wp)
   const scenario = getScenarioRounds(wp)
   const memory = getMemoryPairs(wp)
   const whoAsk = getWhoAskRounds(wp)
 
   return {
-    registros: getMaxModulo1Registros(wp),
+    registros: EXAM_CAPS.modulo1 * 10,
     valores: VALORES_MAX,
-    quiz: quiz.length * 20,
+    quiz: EXAM_CAPS.quiz * 20,
     puzzle: PUZZLE_MAX,
-    miniTrueFalse: tf.length * 8,
+    miniTrueFalse: EXAM_CAPS.trueFalse * 8,
     miniMatch: pairs.length * 10,
-    miniScramble: scr.length * 10,
-    miniOdd: odd.length * 10,
+    miniScramble: EXAM_CAPS.scramble * 10,
+    miniOdd: EXAM_CAPS.oddOne * 10,
     miniScenario: scenario.length * SCENARIO_PTS_PER_ROUND,
     miniMemory: memory.length * MEMORY_PTS_PER_PAIR,
-    miniWordle: WORDLE_MAX,
+    miniWordle: WORDLE_MAX * WORDLE_ROUNDS_PER_SESSION,
     miniWhoToAsk: whoAsk.length * WHO_ASK_PTS,
   }
 }

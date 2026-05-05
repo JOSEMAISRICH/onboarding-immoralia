@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   DndContext,
   closestCenter,
@@ -17,6 +17,15 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import ModuleWrapper from '../components/ModuleWrapper'
 import { pasosProceso as defaultPasos } from '../data/pasosProceso'
+import { useReportExamQuestionProgress } from '../context/ExamProgressContext'
+import { fingerprintSteps, readGameResume, writeGameResume } from '../lib/minigameResumeStorage'
+
+function isPermutation(ordered, canon) {
+  if (!ordered?.length || ordered.length !== canon.length) return false
+  const a = [...ordered].sort()
+  const b = [...canon].sort()
+  return a.every((x, i) => x === b[i])
+}
 
 function shuffle(items) {
   const copy = [...items]
@@ -57,14 +66,31 @@ function SortableStep({ id, label }) {
   )
 }
 
-function Puzzle({ onComplete, steps = defaultPasos }) {
+function Puzzle({ workplace = 'immoralia', onComplete, steps = defaultPasos }) {
+  const fingerprint = useMemo(() => fingerprintSteps(steps), [steps])
+  const hydratedForFp = useRef(null)
+
   const [orderedSteps, setOrderedSteps] = useState(() => shuffle(steps))
   const [validated, setValidated] = useState(false)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (!steps.length) return
+    if (hydratedForFp.current === fingerprint) return
+    hydratedForFp.current = fingerprint
+    const s = readGameResume(workplace, 'puzzle', fingerprint)
+    if (s?.orderedSteps && isPermutation(s.orderedSteps, steps)) {
+      setOrderedSteps(s.orderedSteps)
+      setValidated(Boolean(s.validated))
+      return
+    }
     setOrderedSteps(shuffle(steps))
     setValidated(false)
-  }, [steps])
+  }, [workplace, fingerprint, steps])
+
+  useEffect(() => {
+    if (!steps.length || hydratedForFp.current !== fingerprint) return
+    writeGameResume(workplace, 'puzzle', fingerprint, { orderedSteps, validated })
+  }, [workplace, fingerprint, steps.length, orderedSteps, validated])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -78,6 +104,18 @@ function Puzzle({ onComplete, steps = defaultPasos }) {
   const isCorrect = useMemo(() => {
     return orderedSteps.every((step, index) => step === steps[index])
   }, [orderedSteps, steps])
+
+  const correctPositions = useMemo(
+    () => orderedSteps.reduce((n, step, i) => n + (step === steps[i] ? 1 : 0), 0),
+    [orderedSteps, steps],
+  )
+  const puzzleProgressIdx = useMemo(() => {
+    if (!steps.length) return 0
+    if (validated && isCorrect) return steps.length - 1
+    return Math.min(Math.max(0, correctPositions - 1), steps.length - 1)
+  }, [steps.length, validated, isCorrect, correctPositions])
+
+  useReportExamQuestionProgress(puzzleProgressIdx, steps.length, steps.length > 0)
 
   const handleDragEnd = (event) => {
     const { active, over } = event

@@ -25,14 +25,14 @@ export function emptyScores() {
 
 /**
  * @param {unknown} raw
- * @returns {{ stepIndex: number, userName: string, workplace: 'general'|'immoralia'|'imcontent'|'immedia', startedAt: number | null, scoreByModule: Record<string, number> }}
+ * @returns {{ stepIndex: number, userName: string, workplace: 'immoralia'|'imcontent'|'immedia', startedAt: number | null, scoreByModule: Record<string, number> }}
  */
 export function normalizeProgress(raw) {
   if (!raw || typeof raw !== 'object') {
     return {
       stepIndex: 0,
       userName: '',
-      workplace: 'general',
+      workplace: 'immoralia',
       startedAt: null,
       scoreByModule: emptyScores(),
     }

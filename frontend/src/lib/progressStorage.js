@@ -1,4 +1,5 @@
 import { EXTRA_GAME_KEYS } from '../data/extraMinijuegos10'
+import { normalizeWorkplaceId } from '../data/workplace'
 import { ONBOARDING_SCHEMA_VERSION, emptyScores } from './onboardingDefaults'
 import { MID_GAME_KEYS } from './onboardingSteps'
 
@@ -19,7 +20,7 @@ export function loadProgress() {
     if (!raw) return null
     const data = JSON.parse(raw)
     if (data.v === 10) {
-      const upgraded = { ...data, v: 11, workplace: data.workplace ?? 'general' }
+      const upgraded = { ...data, v: 11, workplace: normalizeWorkplaceId(data.workplace) }
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(upgraded))
       } catch {

@@ -23,21 +23,21 @@ function CurrentLessonBanner({ unit, pointsCap }) {
   if (!unit) return null
 
   return (
-    <div className="animate-bounce-in-soft mb-6 overflow-hidden rounded-2xl border border-cyan-400/35 bg-gradient-to-r from-cyan-950/70 via-indigo-950/55 to-violet-950/45 px-4 py-3 shadow-lg shadow-cyan-900/20 ring-1 ring-white/5">
+    <div className="animate-bounce-in-soft mb-6 overflow-hidden rounded-2xl border border-blue-100/90 bg-gradient-to-r from-emerald-50/90 via-sky-50 to-blue-50/80 px-4 py-3 shadow-lg shadow-blue-100/30 ring-1 ring-white/70">
       <div className="flex flex-wrap items-center gap-2 gap-y-1">
         <span className="animate-emoji-pop text-3xl" aria-hidden>
           {unit.emoji}
         </span>
-        <p className="text-[11px] font-bold uppercase tracking-widest text-cyan-200/95">Mision actual</p>
-        <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-100">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-blue-900">Mision actual</p>
+        <span className="rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-blue-950 shadow-sm">
           ~{unit.minutes} min
         </span>
         {typeof pointsCap === 'number' && pointsCap > 0 ? (
-          <span className="ml-auto text-xs font-semibold text-fuchsia-200/90">Hasta {pointsCap} pts</span>
+          <span className="ml-auto text-xs font-semibold text-blue-900">Hasta {pointsCap} pts</span>
         ) : null}
       </div>
-      <p className="mt-2 text-xl font-bold leading-tight text-white md:text-2xl">{unit.title}</p>
-      <p className="mt-2 text-base leading-relaxed text-cyan-100/90 md:text-lg">{unit.objective}</p>
+      <p className="mt-2 text-xl font-bold leading-tight text-slate-900 md:text-2xl">{unit.title}</p>
+      <p className="mt-2 text-base leading-relaxed text-slate-700 md:text-lg">{unit.objective}</p>
       <p className="mt-3 text-xs italic text-slate-400 md:text-sm">{vibe}</p>
     </div>
   )

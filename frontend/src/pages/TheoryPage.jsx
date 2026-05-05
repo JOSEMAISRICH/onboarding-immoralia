@@ -1,22 +1,14 @@
-import { useMemo } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useOnboarding } from '../context/OnboardingContext'
+import SopsNavLink from '../components/SopsNavLink'
 import TheoryLibraryContent from '../components/TheoryLibraryContent'
+import { STEPS } from '../lib/onboardingSteps'
 
 /** Solo teoria: lectura y fichas. Minijuegos viven en /minijuegos (ruta aparte). */
 function TheoryPage() {
-  const { userName, workplace, stepIndex, beginMinijuegos } = useOnboarding()
+  const { userName, workplace, stepIndex } = useOnboarding()
   const navigate = useNavigate()
-
-  const theoryUrl = useMemo(() => {
-    const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
-    return `${typeof window !== 'undefined' ? window.location.origin : ''}${base}/teoria`
-  }, [])
-
-  const goToMinijuegos = () => {
-    if (stepIndex === 0) beginMinijuegos()
-    navigate('/minijuegos')
-  }
+  const examResumeStepDisplay = stepIndex >= 1 ? Math.min(stepIndex + 1, STEPS.length) : null
 
   if (!userName) {
     return <Navigate to="/" replace />
@@ -24,39 +16,50 @@ function TheoryPage() {
 
   return (
     <div className="min-h-screen">
-      <header className="animate-fade-up border-b border-cyan-500/25 bg-indigo-950/90 px-5 py-6 backdrop-blur-md md:py-7">
+      <header className="animate-fade-up border-b border-blue-100/95 bg-white/92 px-5 py-6 shadow-sm shadow-blue-100/70 backdrop-blur-md md:py-7">
         <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-5">
           <div className="min-w-0 max-w-xl space-y-3">
-            <p className="inline-flex items-center gap-2 rounded-full border border-cyan-400/35 bg-cyan-500/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-cyan-200/95">
+            <p className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-blue-900">
               <span className="animate-wiggle-soft inline-block" aria-hidden>
                 📚
               </span>
-              Teoría · paso principal
+              Teoría
             </p>
-            <h1 className="font-display text-3xl font-bold tracking-tight text-white md:text-4xl">
+            <h1 className="font-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
               Biblioteca de lectura
             </h1>
-            <p className="text-base leading-relaxed text-slate-300 md:text-lg">
-              Hola, <strong className="text-xl font-bold text-white md:text-2xl">{userName}</strong>. Estás en el
-              espacio correcto: aquí está toda la <strong className="text-cyan-200">teoría</strong> de tu equipo antes
-              de los minijuegos. Explora documentación y fichas con calma.
+            <p className="text-base leading-relaxed text-slate-600 md:text-lg">
+              Hola, <strong className="text-xl font-bold text-slate-900 md:text-2xl">{userName}</strong>. Toda la información
+              está en las <strong className="text-blue-800">fichas</strong>: abre cada tema y lee el contenido completo.
+              Si tu equipo comparte{' '}
+              <strong className="text-blue-800">vídeos</strong> (Loom, grabaciones), úsalos como apoyo enlazados desde
+              Slack o ClickUp.
             </p>
+            {examResumeStepDisplay ? (
+              <div className="flex flex-col gap-2 pt-4">
+                <Link
+                  to="/minijuegos"
+                  className="inline-flex w-full max-w-md items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-600 px-5 py-3.5 text-base font-bold text-white shadow-lg shadow-teal-600/25 transition hover:brightness-[1.06] active:scale-[0.99] sm:w-auto md:py-4 md:text-lg"
+                >
+                  <span aria-hidden>▶</span>
+                  Seguir examen donde lo dejaste
+                  <span className="font-semibold opacity-95">
+                    · paso {examResumeStepDisplay} de {STEPS.length}
+                  </span>
+                </Link>
+                <p className="max-w-md text-xs leading-snug text-slate-500 md:text-sm">
+                  Tu paso en el recorrido se guarda en este navegador; volver aquí no te hace empezar de cero.
+                </p>
+              </div>
+            ) : (
+              <p className="max-w-xl pt-4 text-xs leading-snug text-slate-500 md:text-sm">
+                Cuando entres al examen interactivo, tu paso y las preguntas en curso se guardan en este navegador; puedes
+                volver a teoría sin perder el sitio.
+              </p>
+            )}
           </div>
-          <div className="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center">
-            <Link
-              to="/sops"
-              className="inline-flex shrink-0 items-center justify-center rounded-xl border border-slate-600 bg-slate-900/90 px-4 py-2.5 text-sm font-semibold text-slate-100 shadow-sm transition hover:border-cyan-500/50 hover:text-white md:px-5 md:text-base"
-            >
-              Ver SOPs
-            </Link>
-            <a
-              href={theoryUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-center text-xs font-medium text-cyan-300/90 underline-offset-2 transition hover:text-cyan-200 hover:underline md:text-sm"
-            >
-              Abrir esta teoría en otra pestaña
-            </a>
+          <div className="flex shrink-0 items-start">
+            <SopsNavLink />
           </div>
         </div>
       </header>
@@ -65,57 +68,6 @@ function TheoryPage() {
         <div className="animate-fade-up" style={{ animationDelay: '120ms', animationFillMode: 'both' }}>
           <TheoryLibraryContent workplace={workplace} onOpenDocTopic={(id) => navigate(`/teoria/ficha/${id}`)} />
         </div>
-
-        <section
-          className="animate-fade-up mt-12 rounded-2xl border border-slate-600/50 bg-slate-900/60 p-6 shadow-lg md:mt-14 md:p-8"
-          style={{ animationDelay: '200ms', animationFillMode: 'both' }}
-        >
-          <h2 className="text-center font-display text-lg font-bold text-white md:text-xl">Tu ruta</h2>
-          <p className="mx-auto mt-2 max-w-lg text-center text-sm text-slate-400 md:text-base">
-            La teoría siempre va primero; los minijuegos son la fase de práctica y puntos.
-          </p>
-
-          <div className="mx-auto mt-8 flex max-w-2xl flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-center">
-            <div className="flex flex-1 flex-col rounded-xl border-2 border-cyan-400/50 bg-cyan-950/40 p-4 text-center shadow-[0_0_24px_rgba(34,211,238,0.12)]">
-              <span className="text-2xl" aria-hidden>
-                📚
-              </span>
-              <p className="mt-2 text-xs font-bold uppercase tracking-widest text-cyan-200/90">Ahora</p>
-              <p className="mt-1 text-base font-bold text-white">Teoría</p>
-              <p className="mt-1 text-xs text-slate-400">Estás en la biblioteca</p>
-            </div>
-
-            <div
-              className="hidden shrink-0 text-2xl text-cyan-400/60 sm:block"
-              aria-hidden
-              title="Después"
-            >
-              →
-            </div>
-            <div className="flex justify-center text-xl text-cyan-400/70 sm:hidden" aria-hidden>
-              ↓
-            </div>
-
-            <div className="flex flex-1 flex-col rounded-xl border border-slate-600/70 bg-slate-950/50 p-4 text-center transition hover:border-amber-500/40">
-              <span className="text-2xl" aria-hidden>
-                🎮
-              </span>
-              <p className="mt-2 text-xs font-bold uppercase tracking-widest text-slate-500">Después</p>
-              <p className="mt-1 text-base font-bold text-slate-200">Minijuegos</p>
-              <p className="mt-1 text-xs text-slate-500">Repasos y puntos</p>
-            </div>
-          </div>
-
-          <div className="mt-8 text-center">
-            <button
-              type="button"
-              className="rounded-xl bg-gradient-to-r from-amber-400 via-orange-400 to-rose-500 px-10 py-3.5 text-base font-bold text-slate-900 shadow-lg transition hover:scale-[1.02] hover:brightness-105 active:scale-[0.99] md:text-lg"
-              onClick={goToMinijuegos}
-            >
-              {stepIndex === 0 ? 'Ir a minijuegos cuando esté listo' : 'Volver a minijuegos'}
-            </button>
-          </div>
-        </section>
       </main>
     </div>
   )

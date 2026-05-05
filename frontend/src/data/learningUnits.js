@@ -15,7 +15,7 @@ export function getLearningUnits(finishStepIndex) {
     {
       stepIndex: 1,
       title: 'Herramientas y normas',
-      objective: 'Saber donde mirar y que normas aplican en el dia a dia.',
+      objective: 'Tras la teoría en la biblioteca, comprobar que sabes donde mirar y que normas aplican.',
       minutes: 5,
       emoji: '🛠️',
     },
@@ -85,8 +85,8 @@ export function getLearningUnits(finishStepIndex) {
     {
       stepIndex: 11,
       title: 'Palabra oculta',
-      objective: 'Adivinar el termino en un numero limitado de intentos.',
-      minutes: 4,
+      objective: 'Tres palabras seguidas: adivina cada termino en hasta seis intentos; las palabras cambian en cada sesion.',
+      minutes: 10,
       emoji: '🟩',
     },
     {

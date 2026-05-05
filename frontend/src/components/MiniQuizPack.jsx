@@ -2,17 +2,15 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import ModuleWrapper from './ModuleWrapper'
 import { createComboDoubleTracker, speedBonusMs } from '../lib/answerGamification'
 import { getQuestionExplanation } from '../lib/questionExplain'
+import { fingerprintQuestions, readGameResume, writeGameResume } from '../lib/minigameResumeStorage'
+import { markExamQuestionSeen } from '../lib/examQuestionSelection'
+import { useReportExamQuestionProgress } from '../context/ExamProgressContext'
 
-const TIMER_MS = 10000
-const SPEED_FAST_MS = 4000
+const DEFAULT_TIMER_MS = 10000
+const DEFAULT_SPEED_FAST_MS = 4000
 const SPEED_BONUS = 5
 
 /**
- * Quiz secuencial con feedback inmediato.
- *
- * - `variant="full"` (default): timer, combo, bonus velocidad, envuelto en ModuleWrapper (minijuegos).
- * - `variant="embedded"`: estilo violeta compacto sin timer ni combo (fichas DocTopic).
- *
  * @param {{
  *   variant?: 'full' | 'embedded'
  *   title?: string
@@ -22,6 +20,11 @@ const SPEED_BONUS = 5
  *   onComplete: (pts: number) => void
  *   childrenAfterDone?: import('react').ReactNode
  *   modoMinijuego?: boolean
+ *   resumeWorkplace?: string
+ *   resumeModuleKey?: string
+ *   trackExamProgress?: boolean
+ *   timerMs?: number
+ *   speedFastMs?: number
  * }} props
  */
 function MiniQuizPack({
@@ -33,6 +36,11 @@ function MiniQuizPack({
   onComplete,
   childrenAfterDone = null,
   modoMinijuego = false,
+  resumeWorkplace,
+  resumeModuleKey,
+  trackExamProgress = false,
+  timerMs = DEFAULT_TIMER_MS,
+  speedFastMs = DEFAULT_SPEED_FAST_MS,
 }) {
   if (variant === 'embedded') {
     return (
@@ -53,6 +61,11 @@ function MiniQuizPack({
       pointsPerCorrect={pointsPerCorrect}
       onComplete={onComplete}
       childrenAfterDone={childrenAfterDone}
+      resumeWorkplace={resumeWorkplace}
+      resumeModuleKey={resumeModuleKey}
+      trackExamProgress={trackExamProgress}
+      timerMs={timerMs}
+      speedFastMs={speedFastMs}
     />
   )
 }
@@ -88,23 +101,23 @@ function EmbeddedSequentialQuiz({ questions, pointsPerCorrect, modoMinijuego, on
   const allAnswered = questions.every((_, i) => answers[i] !== undefined)
 
   return (
-    <div className="rounded-2xl border border-violet-300/25 bg-slate-950/55 p-4">
-      <h3 className="text-sm font-semibold text-violet-200">
+    <div className="rounded-2xl border border-blue-200 bg-white p-4 shadow-sm shadow-blue-100/80">
+      <h3 className="text-sm font-semibold text-blue-900">
         {modoMinijuego ? 'Repaso con preguntas' : 'Repaso rapido en esta ficha'}
       </h3>
-      <p className="mb-3 text-xs text-slate-400">
+      <p className="mb-3 text-xs text-slate-500">
         Pregunta {questionIndex + 1} de {questions.length} · +{pointsPerCorrect} pts si aciertas
       </p>
-      <p className="mb-3 text-base font-medium text-slate-100">{current.question}</p>
+      <p className="mb-3 text-base font-medium text-slate-900">{current.question}</p>
       <div className="grid gap-2">
         {current.options.map((option, optionIndex) => {
           const isSelected = selected === optionIndex
           let className =
-            'rounded-xl border border-violet-300/30 bg-violet-500/10 px-4 py-3 text-left text-sm transition'
+            'rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm text-slate-800 transition hover:border-blue-300 hover:bg-blue-50/90'
           if (hasAnswered && isSelected) {
             className = answerIsCorrect
-              ? 'rounded-xl border border-emerald-300/60 bg-emerald-300/15 px-4 py-3 text-left text-sm'
-              : 'rounded-xl border border-rose-300/60 bg-rose-300/15 px-4 py-3 text-left text-sm'
+              ? 'rounded-xl border border-emerald-400 bg-emerald-50 px-4 py-3 text-left text-sm text-emerald-950'
+              : 'rounded-xl border border-rose-400 bg-rose-50 px-4 py-3 text-left text-sm text-rose-950'
           }
           return (
             <button
@@ -121,7 +134,7 @@ function EmbeddedSequentialQuiz({ questions, pointsPerCorrect, modoMinijuego, on
       </div>
       {hasAnswered ? (
         <p
-          className={`mt-3 text-sm font-semibold ${answerIsCorrect ? 'text-emerald-300' : 'text-rose-300'}`}
+          className={`mt-3 text-sm font-semibold ${answerIsCorrect ? 'text-emerald-700' : 'text-rose-700'}`}
         >
           {answerIsCorrect ? `+${pointsPerCorrect} pts` : '0 pts — revisa la ficha si quieres.'}
         </p>
@@ -129,7 +142,7 @@ function EmbeddedSequentialQuiz({ questions, pointsPerCorrect, modoMinijuego, on
       {hasAnswered && !isLast ? (
         <button
           type="button"
-          className="mt-4 rounded-xl bg-gradient-to-r from-violet-300 to-cyan-300 px-4 py-2 text-sm font-semibold text-slate-900"
+          className="mt-4 rounded-xl bg-gradient-to-r from-blue-500 to-teal-500 px-4 py-2 text-sm font-semibold text-white shadow-sm"
           onClick={() => setQuestionIndex((i) => i + 1)}
         >
           Siguiente
@@ -150,51 +163,146 @@ function EmbeddedSequentialQuiz({ questions, pointsPerCorrect, modoMinijuego, on
   )
 }
 
-function FullSequentialQuiz({ title, subtitle, questions, pointsPerCorrect, onComplete, childrenAfterDone }) {
+function normalizeAnswersMini(arr, len) {
+  if (!Array.isArray(arr) || len <= 0) return []
+  const out = []
+  for (let i = 0; i < len; i += 1) out[i] = arr[i]
+  return out
+}
+
+function FullSequentialQuiz({
+  title,
+  subtitle,
+  questions,
+  pointsPerCorrect,
+  onComplete,
+  childrenAfterDone,
+  resumeWorkplace,
+  resumeModuleKey,
+  trackExamProgress = false,
+  timerMs = DEFAULT_TIMER_MS,
+  speedFastMs = DEFAULT_SPEED_FAST_MS,
+}) {
+  const fingerprint = useMemo(() => fingerprintQuestions(questions), [questions])
+  const hydratedForFp = useRef(null)
+  const persist =
+    typeof resumeWorkplace === 'string' &&
+    resumeWorkplace.length > 0 &&
+    typeof resumeModuleKey === 'string' &&
+    resumeModuleKey.length > 0
+
+  const workplaceForSeen = persist ? resumeWorkplace : ''
+
   const [questionIndex, setQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState([])
   const [runningTotal, setRunningTotal] = useState(0)
   const [lastDetail, setLastDetail] = useState(null)
-  const [timerLeft, setTimerLeft] = useState(TIMER_MS)
+  const [timerLeft, setTimerLeft] = useState(timerMs)
   /** @type {React.MutableRefObject<number>} */
   const startRef = useRef(0)
-  const comboRef = useRef(createComboDoubleTracker())
+  const comboRef = useRef(createComboDoubleTracker(null))
+  const answersRef = useRef([])
+
+  useLayoutEffect(() => {
+    answersRef.current = answers
+  }, [answers])
+
+  useReportExamQuestionProgress(questionIndex, questions.length, Boolean(trackExamProgress))
+
+  useLayoutEffect(() => {
+    if (!persist || !questions.length) return
+    if (hydratedForFp.current === fingerprint) return
+    hydratedForFp.current = fingerprint
+    const s = readGameResume(resumeWorkplace, resumeModuleKey, fingerprint)
+    if (!s) return
+    const qi =
+      typeof s.questionIndex === 'number'
+        ? Math.max(0, Math.min(s.questionIndex, questions.length - 1))
+        : 0
+    setQuestionIndex(qi)
+    setAnswers(normalizeAnswersMini(s.answers, questions.length))
+    setRunningTotal(typeof s.runningTotal === 'number' ? s.runningTotal : 0)
+    comboRef.current = createComboDoubleTracker(s.combo ?? null)
+  }, [persist, resumeWorkplace, resumeModuleKey, fingerprint, questions])
 
   const current = questions[questionIndex]
   const hasAnswered = answers[questionIndex] !== undefined
   const isLast = questionIndex === questions.length - 1
   const selected = answers[questionIndex]
-  const answerIsCorrect = selected === current.correctIndex
+  const answerIsCorrect = Boolean(current && selected === current.correctIndex)
 
   useLayoutEffect(() => {
     startRef.current = Date.now()
   }, [questionIndex])
 
   useEffect(() => {
-    setTimerLeft(TIMER_MS)
+    setTimerLeft(timerMs)
     setLastDetail(null)
-  }, [questionIndex])
+  }, [questionIndex, timerMs])
+
+  useEffect(() => {
+    if (!persist || !questions.length) return
+    if (hydratedForFp.current !== fingerprint) return
+    writeGameResume(resumeWorkplace, resumeModuleKey, fingerprint, {
+      questionIndex,
+      answers,
+      runningTotal,
+      combo: comboRef.current.snapshot(),
+    })
+  }, [
+    persist,
+    resumeWorkplace,
+    resumeModuleKey,
+    fingerprint,
+    questions.length,
+    questionIndex,
+    answers,
+    runningTotal,
+  ])
 
   useEffect(() => {
     if (hasAnswered) return undefined
     const t = window.setInterval(() => {
       const elapsed = Date.now() - startRef.current
-      setTimerLeft(Math.max(0, TIMER_MS - elapsed))
+      setTimerLeft(Math.max(0, timerMs - elapsed))
     }, 80)
     return () => window.clearInterval(t)
-  }, [hasAnswered, questionIndex])
+  }, [hasAnswered, questionIndex, timerMs])
 
-  const barPct = Math.min(100, Math.round((timerLeft / TIMER_MS) * 100))
+  useEffect(() => {
+    if (hasAnswered || !current) return undefined
+    const qi = questionIndex
+    const cq = questions[qi]
+    if (!cq?.question) return undefined
+    const id = window.setTimeout(() => {
+      if (answersRef.current[qi] !== undefined) return
+      comboRef.current.record(false)
+      if (workplaceForSeen) markExamQuestionSeen(workplaceForSeen, cq.question)
+      const wrongIdx = cq.options.length <= 1 ? 0 : (cq.correctIndex + 1) % cq.options.length
+      setLastDetail(null)
+      setAnswers((prev) => {
+        if (prev[qi] !== undefined) return prev
+        const next = [...prev]
+        while (next.length <= qi) next.push(undefined)
+        next[qi] = wrongIdx
+        return next
+      })
+    }, timerMs)
+    return () => window.clearTimeout(id)
+  }, [questionIndex, hasAnswered, current, questions, workplaceForSeen, timerMs])
+
+  const barPct = Math.min(100, Math.round((timerLeft / timerMs) * 100))
 
   const pick = (optionIndex) => {
-    if (hasAnswered) return
+    if (!current || hasAnswered) return
     /* eslint-disable-next-line react-hooks/purity -- elapsed time in click handler */
     const elapsed = Date.now() - startRef.current
     const ok = optionIndex === current.correctIndex
     const { multiplier } = comboRef.current.record(ok)
+    if (workplaceForSeen) markExamQuestionSeen(workplaceForSeen, current.question)
     if (ok) {
       const base = pointsPerCorrect * multiplier
-      const bonus = speedBonusMs(elapsed, { fastMs: SPEED_FAST_MS, bonusPts: SPEED_BONUS })
+      const bonus = speedBonusMs(elapsed, { fastMs: speedFastMs, bonusPts: SPEED_BONUS })
       setRunningTotal((t) => t + base + bonus)
       setLastDetail({ base, multiplier, bonus })
     } else {
@@ -212,30 +320,38 @@ function FullSequentialQuiz({ title, subtitle, questions, pointsPerCorrect, onCo
 
   const allAnswered = questions.every((_, i) => answers[i] !== undefined)
 
+  if (!questions.length || !current) {
+    return (
+      <ModuleWrapper title={title} subtitle={subtitle}>
+        <p className="text-sm text-slate-600">Cargando preguntas…</p>
+      </ModuleWrapper>
+    )
+  }
+
   return (
     <ModuleWrapper title={title} subtitle={subtitle}>
-      <p className="mb-2 text-sm text-slate-300">
+      <p className="mb-2 text-sm text-slate-600">
         Pregunta {questionIndex + 1} de {questions.length} · Puntos: {runningTotal}
       </p>
 
-      <div className="mb-3 h-2 overflow-hidden rounded-full bg-slate-800/90 ring-1 ring-amber-500/20">
+      <div className="mb-3 h-2 overflow-hidden rounded-full bg-slate-200 ring-1 ring-amber-300/40">
         <div
           className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-400 transition-[width] duration-75"
           style={{ width: `${barPct}%` }}
         />
       </div>
 
-      <div className="rounded-2xl border border-amber-300/30 bg-slate-950/60 p-4">
-        <h3 className="mb-4 text-lg font-semibold text-slate-100">{current.question}</h3>
+      <div className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50/80 to-white p-4 shadow-inner shadow-amber-100">
+        <h3 className="mb-4 text-lg font-semibold text-slate-900">{current.question}</h3>
         <div className="grid gap-2">
           {current.options.map((option, optionIndex) => {
             const isSelected = selected === optionIndex
             let className =
-              'rounded-xl border border-amber-300/35 bg-amber-500/10 px-4 py-3 text-left text-sm transition'
+              'rounded-xl border border-amber-200 bg-white px-4 py-3 text-left text-sm text-slate-800 transition hover:border-amber-400 hover:bg-amber-50'
             if (hasAnswered && isSelected) {
               className = answerIsCorrect
-                ? 'rounded-xl border border-emerald-300/60 bg-emerald-300/20 px-4 py-3 text-left text-sm'
-                : 'rounded-xl border border-rose-300/60 bg-rose-300/20 px-4 py-3 text-left text-sm'
+                ? 'rounded-xl border border-emerald-400 bg-emerald-50 px-4 py-3 text-left text-sm text-emerald-950'
+                : 'rounded-xl border border-rose-400 bg-rose-50 px-4 py-3 text-left text-sm text-rose-950'
             }
             return (
               <button
@@ -251,16 +367,16 @@ function FullSequentialQuiz({ title, subtitle, questions, pointsPerCorrect, onCo
           })}
         </div>
         {hasAnswered ? (
-          <div className="mt-4 space-y-2 rounded-xl border border-slate-600/50 bg-slate-900/60 p-3 text-sm leading-relaxed">
+          <div className="mt-4 space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm leading-relaxed text-slate-700">
             {answerIsCorrect && lastDetail ? (
-              <p className="font-semibold text-emerald-300">
+              <p className="font-semibold text-emerald-700">
                 +{lastDetail.base} pts (combo x{lastDetail.multiplier})
                 {lastDetail.bonus > 0 ? ` + ${lastDetail.bonus} velocidad` : ''}
               </p>
             ) : (
-              <p className="font-semibold text-rose-300">0 pts en esta — sigue.</p>
+              <p className="font-semibold text-rose-700">0 pts en esta — sigue.</p>
             )}
-            <p className="text-slate-300">{getQuestionExplanation(current, answerIsCorrect)}</p>
+            <p>{getQuestionExplanation(current, answerIsCorrect)}</p>
           </div>
         ) : null}
       </div>

@@ -8,9 +8,10 @@ function WelcomePage() {
 
   if (apiOn && !hydrated) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 text-slate-300">
-        <p className="text-2xl font-bold text-white">Cargando progreso…</p>
-        <p className="max-w-md text-center text-base text-slate-500">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 text-slate-700">
+        <span className="h-10 w-10 animate-spin rounded-full border-2 border-teal-400 border-t-transparent" aria-hidden />
+        <p className="text-2xl font-bold text-slate-900">Cargando progreso…</p>
+        <p className="max-w-md text-center text-base text-slate-600">
           Si tarda, comprobar que el backend en VITE_API_URL está en marcha.
         </p>
       </div>

@@ -1,9 +1,10 @@
 /**
  * Combo: 3 aciertos seguidos → la siguiente pregunta correcta vale x2 (una vez). Se rompe con un fallo.
+ * @param {{ streak?: number, applyDoubleOnNextCorrect?: boolean } | null} initial — para reanudar partida guardada.
  */
-export function createComboDoubleTracker() {
-  let streak = 0
-  let applyDoubleOnNextCorrect = false
+export function createComboDoubleTracker(initial = null) {
+  let streak = initial?.streak ?? 0
+  let applyDoubleOnNextCorrect = initial?.applyDoubleOnNextCorrect ?? false
 
   return {
     /** @returns {{ multiplier: number }} */
@@ -25,6 +26,9 @@ export function createComboDoubleTracker() {
     reset() {
       streak = 0
       applyDoubleOnNextCorrect = false
+    },
+    snapshot() {
+      return { streak, applyDoubleOnNextCorrect }
     },
   }
 }

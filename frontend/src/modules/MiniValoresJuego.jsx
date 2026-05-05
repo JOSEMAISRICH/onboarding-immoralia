@@ -5,9 +5,14 @@ import {
   preguntasMiniValores,
 } from '../data/miniValoresJuego'
 
-function MiniValoresJuego({ onComplete }) {
+function MiniValoresJuego({ workplace = 'immoralia', onComplete }) {
   return (
     <MiniQuizPack
+      resumeWorkplace={workplace}
+      resumeModuleKey="valores"
+      trackExamProgress
+      timerMs={6500}
+      speedFastMs={2600}
       title="Minijuego 2: Valores del manifiesto"
       subtitle={`${MINI_VALORES_POINTS} pts por acierto. Max ${maxMiniValoresJuego} pts. Relaciona cada idea con su valor del manifiesto (consulta la teoria de tu espacio si lo necesitas).`}
       questions={preguntasMiniValores}

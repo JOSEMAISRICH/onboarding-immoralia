@@ -229,11 +229,68 @@ export const memoryImcontent = [
   { id: 'd', left: 'Community', right: 'Interaccion y tono' },
 ]
 
-/** Palabra de 5 letras (sin acentos); max si aciertas en ≤6 intentos segun modulo */
-export const wordleImmoralia = { word: 'ETICA', clue: 'Base del manifiesto' }
-export const wordleGeneral = { word: 'DATOS', clue: 'Decision con evidencia' }
-export const wordleImmedia = { word: 'MARCA', clue: 'Paid y creatividad' }
-export const wordleImcontent = { word: 'TEXTO', clue: 'Copy y redes' }
+/** Palabras de 5 letras (sin acentos). En cada sesión se eligen 3 distintas al azar del pool del espacio. */
+export const WORDLE_ROUNDS_PER_SESSION = 3
+
+/** @typedef {{ word: string, clue: string }} WordleEntry */
+
+export const wordlePoolImmoralia = /** @type {WordleEntry[]} */ ([
+  { word: 'ETICA', clue: 'Base del manifiesto' },
+  { word: 'NORMA', clue: 'Lo que acordamos cumplir entre todos' },
+  { word: 'VALOR', clue: 'Principio que guia decisiones dificiles' },
+  { word: 'METAS', clue: 'Resultados concretos que persigues' },
+  { word: 'PASOS', clue: 'Orden en el proceso interno' },
+  { word: 'GUIAS', clue: 'Referencias para hacer bien el trabajo' },
+  { word: 'FICHA', clue: 'Documento corto que resume lo esencial' },
+  { word: 'PLAZO', clue: 'Tiempo acordado para entregar' },
+  { word: 'ORDEN', clue: 'Claridad en prioridades y siguientes pasos' },
+  { word: 'PAUSA', clue: 'Momento para revisar antes de seguir' },
+])
+
+export const wordlePoolGeneral = /** @type {WordleEntry[]} */ ([
+  { word: 'DATOS', clue: 'Decision con evidencia' },
+  { word: 'LISTA', clue: 'Check simple para no olvidar pasos' },
+  { word: 'BASES', clue: 'Criterios minimos antes de avanzar' },
+  { word: 'AUDAZ', clue: 'Propuesta arriesgada pero fundamentada' },
+  { word: 'HECHO', clue: 'Estado cuando algo ya esta cerrado' },
+  { word: 'FOCO', clue: 'Prioridad clara entre muchas tareas' },
+  { word: 'IDEAS', clue: 'Semillas de soluciones antes del plan' },
+  { word: 'CALMA', clue: 'Actitud ante urgencias falsas' },
+  { word: 'LOGRO', clue: 'Resultado que cerraste con criterio' },
+  { word: 'ORDEN', clue: 'Todo en su sitio para avanzar rapido' },
+])
+
+export const wordlePoolImmedia = /** @type {WordleEntry[]} */ ([
+  { word: 'MARCA', clue: 'Identidad que el cliente refuerza con paid' },
+  { word: 'PAUTA', clue: 'Inversion y alcance en medios de pago' },
+  { word: 'PIEZA', clue: 'Creativo que sube a la plataforma' },
+  { word: 'CANAL', clue: 'Donde impacta la inversion' },
+  { word: 'VIDEO', clue: 'Formato que suele pedir mas variantes' },
+  { word: 'MEDIO', clue: 'Plataforma donde compras impresiones' },
+  { word: 'CREAR', clue: 'Primera fase antes de testear creatividades' },
+  { word: 'PIXEL', clue: 'Sirve para medir conversiones' },
+  { word: 'BRIEF', clue: 'Acuerdo corto de objetivo y mensaje' },
+  { word: 'CAMPA', clue: 'Conjunto de anuncios con un mismo objetivo' },
+])
+
+export const wordlePoolImcontent = /** @type {WordleEntry[]} */ ([
+  { word: 'TEXTO', clue: 'Copy que lee la gente' },
+  { word: 'REDES', clue: 'Donde publicas y conversas' },
+  { word: 'VIRAL', clue: 'Contenido que se comparte solo' },
+  { word: 'GUION', clue: 'Linea base antes de grabar o animar' },
+  { word: 'TREND', clue: 'Ola cultural que adaptas con criterio' },
+  { word: 'EDITA', clue: 'Recorta y pulsa antes de publicar' },
+  { word: 'NOTAS', clue: 'Ideas sueltas que luego ordenas' },
+  { word: 'STORY', clue: 'Formato corto vertical habitual' },
+  { word: 'AUDIO', clue: 'Podcast voz o pieza sonora' },
+  { word: 'VIDEO', clue: 'Pieza en movimiento para el feed' },
+])
+
+export const wordleImmoralia = wordlePoolImmoralia[0]
+export const wordleGeneral = wordlePoolGeneral[0]
+export const wordleImmedia = wordlePoolImmedia[0]
+export const wordleImcontent = wordlePoolImcontent[0]
+
 
 /** @typedef {{ id: number, prompt: string, options: { label: string, correct: boolean }[], explanation: string }} WhoAskRound */
 
@@ -473,7 +530,9 @@ export const whoAskImcontent = /** @type {WhoAskRound[]} */ ([
 export const SCENARIO_PTS_PER_ROUND = 15
 /** Puntos por par encontrado en memoria */
 export const MEMORY_PTS_PER_PAIR = 15
-/** Wordle: todo o nada visual por simplicidad */
+/** Wordle: puntos si aciertas una palabra; el paso completo suma hasta WORDLE_MAX × WORDLE_ROUNDS_PER_SESSION */
 export const WORDLE_MAX = 60
+/** Intentos máximos (progreso en barra y reglas del minijuego). */
+export const WORDLE_MAX_TRIES = 6
 /** WhoToAsk: 5 × 12 */
 export const WHO_ASK_PTS = 12

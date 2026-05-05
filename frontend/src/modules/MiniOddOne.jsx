@@ -1,12 +1,36 @@
-import { useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import ModuleWrapper from '../components/ModuleWrapper'
 import { getOddOneExplanation } from '../lib/questionExplain'
 import { MINI_POINTS, preguntasIntruso as defaultIntruso } from '../data/minijuegos'
+import { fingerprintQuestions, readGameResume, writeGameResume } from '../lib/minigameResumeStorage'
+import { markExamQuestionSeen } from '../lib/examQuestionSelection'
+import { useReportExamQuestionProgress } from '../context/ExamProgressContext'
 
-function MiniOddOne({ onComplete, questions = defaultIntruso }) {
+function MiniOddOne({ workplace = 'immoralia', onComplete, questions = defaultIntruso }) {
+  const fingerprint = useMemo(() => fingerprintQuestions(questions), [questions])
+  const hydratedForFp = useRef(null)
+
   const [index, setIndex] = useState(0)
   const [picked, setPicked] = useState(null)
   const [hits, setHits] = useState(0)
+
+  useLayoutEffect(() => {
+    if (!questions.length) return
+    if (hydratedForFp.current === fingerprint) return
+    hydratedForFp.current = fingerprint
+    const s = readGameResume(workplace, 'miniOdd', fingerprint)
+    if (!s) return
+    const qi =
+      typeof s.index === 'number' ? Math.max(0, Math.min(s.index, questions.length - 1)) : 0
+    setIndex(qi)
+    setPicked(typeof s.picked === 'number' ? s.picked : null)
+    setHits(typeof s.hits === 'number' ? s.hits : 0)
+  }, [workplace, fingerprint, questions])
+
+  useEffect(() => {
+    if (!questions.length || hydratedForFp.current !== fingerprint) return
+    writeGameResume(workplace, 'miniOdd', fingerprint, { index, picked, hits })
+  }, [workplace, fingerprint, questions.length, index, picked, hits])
 
   const maxOdd = questions.length * MINI_POINTS.oddPerHit
   const q = questions[index]
@@ -16,6 +40,7 @@ function MiniOddOne({ onComplete, questions = defaultIntruso }) {
 
   const choose = (optionIndex) => {
     if (answered) return
+    markExamQuestionSeen(workplace, q.question)
     setPicked(optionIndex)
     if (optionIndex === q.oddIndex) setHits((h) => h + 1)
   }
@@ -30,6 +55,8 @@ function MiniOddOne({ onComplete, questions = defaultIntruso }) {
   }
 
   const earned = hits * MINI_POINTS.oddPerHit
+
+  useReportExamQuestionProgress(index, questions.length, Boolean(questions.length))
 
   return (
     <ModuleWrapper

@@ -1,24 +1,57 @@
 /**
- * Modulo 1 alternativo (no Immoralia): 21 micro-quiz sobre la teoria del espacio.
- * 10 pts por acierto; max 210 (igual que fichas Immoralia).
+ * Modulo 1 en formato test (todos los espacios): micro-quiz alineado a las fichas de teoría (`plataformas.js`).
+ * Bloque cultura/roles (g6–g21, parte de g2/g10): resumido en la ficha «Ecosistema Immoral Marketing» y complementado con Slack, ClickUp, calendario, referidos y gastos.
+ * 10 pts por acierto.
  */
 
 function q(id, title, question, options, correctIndex) {
   return { id, title, question, options, correctIndex }
 }
 
+/** Immoralia / general: prioriza contenido de biblioteca (herramientas + marco), varias preguntas por herramienta clave. */
 export const modulo1General = [
-  q('g1', 'Onboarding', 'Los minijuegos sirven sobre todo para:', ['Solo decorar', 'Practicar y puntuar; la teoria va aparte', 'Evitar leer', 'Reemplazar al responsable'], 1),
   q('g2', 'Trazabilidad', 'Antes de pedir accesos, que suele recomendarse?', ['Nada', 'Mirar documentacion interna o Slack', 'Pedir al CEO siempre', 'Crear cuenta nueva'], 1),
-  q('g3', 'ClickUp', 'ClickUp se usa mucho para:', ['Solo chat', 'Tareas, fechas y contexto del trabajo', 'Solo nominas', 'DNS'], 1),
-  q('g4', 'Slack', 'Los hilos en Slack ayudan a:', ['Perder mensajes', 'No saturar el canal y mantener contexto', 'Evitar busquedas', 'Borrar historial'], 1),
-  q('g5', 'Holded', 'Holded en operativa diaria suele usarse tambien para:', ['Solo CRM externo', 'Fichaje y control horario cuando aplica', 'Codigo', 'Diseno'], 1),
+  q('g22', 'Verticales', 'Immoral Marketing agrupa marcas como Immoralia, Immedia o Imcontent como:', ['Marcas aisladas sin relacion', 'Verticales del mismo grupo con focos distintos', 'Solo hosting', 'Solo una herramienta'], 1),
+  q('g23', 'Fuente de verdad', 'Lo que compromete fechas y alcance deberia reflejarse sobre todo en:', ['Solo un DM largo en Slack', 'Una tarea o documento enlazado (p. ej. ClickUp)', 'Solo el titulo del canal', 'Sin registrar'], 1),
+
+  q('g24', 'n8n', 'n8n encaja mejor como:', ['Editor de nominas', 'Plataforma de automatizacion de flujos con disparadores y nodos', 'CRM unico', 'Solo correo personal'], 1),
+  q('g25', 'n8n disparadores', 'Ejemplos habituales de disparadores en estos flujos:', ['Solo impresora', 'Webhooks, horarios o lectura de hojas', 'Solo DNS', 'Solo memes en Slack'], 1),
+  q('g26', 'n8n nodos', 'Los nodos en un workflow suelen servir para:', ['Solo cambiar el logo', 'Transformar datos o llamar APIs entre pasos', 'Fichar en Holded manualmente', 'Borrar historial de Slack'], 1),
+  q('g27', 'n8n errores', 'Si algo en un flujo automatizado fallo, primer paso sensato:', ['Ignorarlo una semana', 'Revisar historial de ejecuciones y el mensaje del nodo que fallo', 'Reinstalar Slack', 'Cambiar DNS sin avisar'], 1),
+  q('g28', 'n8n credenciales', 'Tokens y credenciales de APIs en automatizacion:', ['Van bien en canal publico', 'Son sensibles; no copies a Notion ni Slack', 'Deben ir en el nombre de la tarea', 'Compartir por WhatsApp siempre'], 1),
+  q('g29', 'n8n y tareas', 'Respecto a ClickUp, la automatizacion con n8n:', ['Elimina la necesidad de priorizar', 'Automatiza lo repetible; ClickUp sigue siendo donde viven las tareas', 'Sustituye al cliente', 'Evita documentar'], 1),
+
+  q('g30', 'Slack hilos', 'Para mensajes largos en un canal, buena practica:', ['Treinta mensajes seguidos sin hilo', 'Responder en hilo para no saturar el canal', 'Borrar el canal', 'Solo mayusculas'], 1),
+  q('g31', 'Slack ruido', 'Antes de publicar en un canal muy amplio, conviene:', ['No pensarlo', 'Preguntarte si interesa a todo el mundo o mejor DM / hilo muy acotado', 'Mencionar a @channel siempre', 'Pegar capturas sin contexto'], 1),
+  q('g32', 'Slack alertas', 'Si una alerta integrada (ClickUp, automatizacion…) es repetida o incomprensible:', ['Silenciar para siempre', 'Escalar con captura, hora y que esperabas que pasara', 'Eliminar ClickUp', 'Ignorar protocolos'], 1),
+  q('g33', 'Slack fichaje', 'Solicitudes de cambio relacionadas con Holded / fichaje:', ['Abrir un canal nuevo improvisado', 'Seguir el canal o proceso que indique la empresa', 'Solo TikTok', 'Sin avisar a nadie'], 1),
+  q('g34', 'Slack estado', 'Actualizar tu estado por la manana en Slack ayuda sobre todo a:', ['Ocultar trabajo', 'Coordinar animo y carga; respetar limites del equipo', 'Evitar reuniones siempre', 'Solo decorar el perfil'], 1),
+
+  q('g35', 'ClickUp', 'ClickUp en Immoralia actua sobre todo como:', ['DNS del dominio', 'Hub operativo: tareas, fechas, comentarios y adjuntos', 'Solo chat interno', 'Reemplazo total de Slack siempre'], 1),
+  q('g36', 'ClickUp tarea', 'Buena practica en una tarea incluye:', ['Solo emoji', 'Titulo claro, contexto minimo, fecha si aplica, responsable y estado real', 'Sin titulo', 'Solo asignar sin describir'], 1),
+  q('g37', 'ClickUp subtareas', 'Las subtareas tienen sentido cuando:', ['Nunca', 'El trabajo se puede partir en entregas revisables', 'La tarea tiene una sola palabra', 'Prohibes comentarios'], 1),
+  q('g38', 'ClickUp enlaces', 'Enlaces a Drive, Loom o entornos de prueba:', ['Solo valen en Slack', 'Conviene tenerlos tambien en la tarea para no perderlos en el chat', 'Prohibidos siempre', 'Solo en papel'], 1),
+  q('g39', 'ClickUp permisos', 'Si no ves una lista o documento que necesitas:', ['Usar cuenta ajena', 'Pedir acceso por el canal acordado u Operaciones', 'Duplicar todo en tu escritorio', 'Borrar el espacio'], 1),
+
+  q('g40', 'Holded', 'Holded como referencia de horas trabajadas:', ['Es opcional si te olvidas', 'Sirve para fichar segun la jornada acordada', 'Solo diseno web', 'Reemplaza Slack'], 1),
+  q('g41', 'Holded correccion', 'Si necesitas correccion de fichaje o ausencia:', ['Editar en Holded sin contar a nadie', 'Avisar al responsable y seguir el flujo de Slack/formulario', 'Solo mensaje al cliente', 'Ignorar hasta la nomina'], 1),
+  q('g42', 'Holded coherencia', 'Vacaciones o ausencias aprobadas deberian:', ['Quedar solo en tu mente', 'Cuadrar en calendario, Holded y tareas donde el equipo o cliente te lean', 'Cancelarse solas', 'Solo en redes sociales'], 1),
+
+  q('g43', 'LastPass', 'LastPass se usa sobre todo para:', ['Editar video', 'Gestionar credenciales de forma segura y evitar texto plano en chat', 'Automatizar campanas paid', 'DNS'], 1),
+  q('g44', 'LastPass', 'Si una entrada del cofre parece caducada o rara:', ['Compartirla en abierto', 'Avisar a Operaciones o tu responsable', 'Ignorarlo', 'Regalar acceso'], 1),
+
+  q('g45', 'Hostinger', 'Antes de tocar DNS o subir cambios a produccion:', ['Da igual el entorno', 'Confirmar produccion vs pruebas y documentar en la tarea', 'Solo Slack sin registro', 'Borrar backups primero'], 1),
+  q('g46', 'Credenciales', 'Credenciales de panel de hosting o DNS suelen:', ['Publicarse en canal abierto', 'Ser sensibles; seguir el flujo que marque Operaciones', 'Ir en biografia de Instagram', 'Enviarse al cliente por Stories'], 1),
+
+  q('g47', 'Whimsical', 'Whimsical encaja mejor para:', ['Fichaje legal', 'Diagramas y wireframes ligeros para alinear antes del detalle final', 'Automatizar nominas', 'Solo facturacion'], 1),
+
+  q('g48', 'Video async', 'Sobre formacion en video (Loom, grabaciones) frente a normas sensibles:', ['El video sustituye cualquier politica escrita', 'Combina video con lectura; lo escrito sigue mandando en compliance/datos sensibles', 'Solo velocidad 2x siempre', 'No tomar notas'], 1),
+
   q('g6', 'Cliente', 'En cultura, el cliente se ve sobre todo como:', ['Factura', 'Aliado estrategico', 'Competidor', 'Usuario anonimo'], 1),
   q('g7', 'Compromisos', 'Si no vas a cumplir una fecha, se espera:', ['Silencio', 'Avisar con antelacion', 'Borrar la tarea', 'Culpar al cliente'], 1),
   q('g8', 'Respuesta', 'En horario laboral, chats/emails de clientes suelen esperar respuesta en:', ['Una semana', 'Menos de 1 hora como regla general', 'Nunca', 'Solo lunes'], 1),
   q('g9', 'Informacion', 'Sobre acuerdos, la cultura busca:', ['Todo verbal sin registro', 'Registrar y compartir; no depender solo de memoria', 'Solo llamadas', 'Evitar compromisos'], 1),
   q('g10', 'Formacion', 'Formacion util: donde compartir hallazgos y como registrar?', ['Solo papel', 'Canal Slack indicado + tarea en ClickUp en Formacion', 'Solo a clientes', 'No documentar'], 1),
-  q('g11', 'Slack estado', 'El estado en Slack por la manana sirve para:', ['Nada', 'Coordinar animo y carga; respetar estados ajenos', 'Esconderse', 'Solo vacaciones'], 1),
   q('g12', 'Gastos', 'Antes de un gasto con fondos de empresa:', ['Gastar y pedir perdon', 'Aprobacion previa segun politica', 'Solo si > 50k', 'Sin reglas'], 1),
   q('g13', 'Vacaciones', 'Antes de vacaciones, buena practica:', ['Desaparecer', 'Continuidad, delegacion y avisos en canales/correo', 'Solo Slack el ultimo dia', 'Borrar tareas'], 1),
   q('g14', 'Festivos', 'Si tu festivo local no esta claro en calendario:', ['Asumir laborable', 'Avisar a tu responsable con tiempo', 'Ignorar', 'Improvisar'], 1),
@@ -78,3 +111,6 @@ export const modulo1Imcontent = [
   q('c20', 'Head NO', 'El Head NO ejecuta normalmente:', ['Estrategia', 'Tareas diarias de diseno/redaccion/publicacion como operativa principal', 'Coordinar equipo', 'Validar propuestas'], 1),
   q('c21', 'Cliente', 'En cuentas asignadas el Head es referente de contenido frente a:', ['Solo interno', 'Cliente', 'Solo proveedor', 'Nadie'], 1),
 ]
+
+/** Immoralia: mismo bloque tipo examen (el modulo 1 en minijuegos no abre fichas). */
+export const modulo1Immoralia = modulo1General

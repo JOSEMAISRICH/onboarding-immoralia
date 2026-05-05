@@ -1,22 +1,59 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import ModuleWrapper from '../components/ModuleWrapper'
 import { createComboDoubleTracker, speedBonusMs } from '../lib/answerGamification'
 import { getTrueFalseExplanation } from '../lib/questionExplain'
 import { MINI_POINTS, preguntasTrueFalse as defaultTrueFalse } from '../data/minijuegos'
+import { fingerprintByText, readGameResume, writeGameResume } from '../lib/minigameResumeStorage'
+import { markExamQuestionSeen } from '../lib/examQuestionSelection'
+import { useReportExamQuestionProgress } from '../context/ExamProgressContext'
 
 const BASE = MINI_POINTS.trueFalsePerHit
 const TIMER_MS = 10000
 const SPEED_FAST_MS = 4000
 const SPEED_BONUS = 5
 
-function MiniTrueFalse({ onComplete, items = defaultTrueFalse }) {
+function MiniTrueFalse({ workplace = 'immoralia', onComplete, items = defaultTrueFalse }) {
+  const fingerprint = useMemo(() => fingerprintByText(items), [items])
+  const hydratedForFp = useRef(null)
+
   const [index, setIndex] = useState(0)
   const [picked, setPicked] = useState(null)
   const [runningTotal, setRunningTotal] = useState(0)
   const [lastDetail, setLastDetail] = useState(null)
   const [timerLeft, setTimerLeft] = useState(TIMER_MS)
   const startRef = useRef(Date.now())
-  const comboRef = useRef(createComboDoubleTracker())
+  const comboRef = useRef(createComboDoubleTracker(null))
+  const pickedRef = useRef(null)
+
+  useLayoutEffect(() => {
+    if (!items.length) return
+    if (hydratedForFp.current === fingerprint) return
+    hydratedForFp.current = fingerprint
+    const s = readGameResume(workplace, 'miniTrueFalse', fingerprint)
+    if (!s) return
+    const qi =
+      typeof s.index === 'number' ? Math.max(0, Math.min(s.index, items.length - 1)) : 0
+    setIndex(qi)
+    setPicked(typeof s.picked === 'boolean' ? s.picked : null)
+    setRunningTotal(typeof s.runningTotal === 'number' ? s.runningTotal : 0)
+    comboRef.current = createComboDoubleTracker(s.combo ?? null)
+  }, [workplace, fingerprint, items])
+
+  useEffect(() => {
+    if (!items.length || hydratedForFp.current !== fingerprint) return
+    writeGameResume(workplace, 'miniTrueFalse', fingerprint, {
+      index,
+      picked,
+      runningTotal,
+      combo: comboRef.current.snapshot(),
+    })
+  }, [workplace, fingerprint, items.length, index, picked, runningTotal])
+
+  useEffect(() => {
+    pickedRef.current = picked
+  }, [picked])
+
+  useReportExamQuestionProgress(index, items.length, Boolean(items.length))
 
   const maxPts = items.length * BASE + items.length * SPEED_BONUS
   const q = items[index]
@@ -39,23 +76,36 @@ function MiniTrueFalse({ onComplete, items = defaultTrueFalse }) {
     return () => window.clearInterval(t)
   }, [answered, index])
 
-  const barPct = Math.min(100, Math.round((timerLeft / TIMER_MS) * 100))
+  const choose = useCallback(
+    (value) => {
+      if (picked !== null || !q) return
+      markExamQuestionSeen(workplace, q.text)
+      setPicked(value)
+      const elapsed = Date.now() - startRef.current
+      const ok = value === q.correct
+      const { multiplier } = comboRef.current.record(ok)
+      if (ok) {
+        const base = BASE * multiplier
+        const bonus = speedBonusMs(elapsed, { fastMs: SPEED_FAST_MS, bonusPts: SPEED_BONUS })
+        setRunningTotal((t) => t + base + bonus)
+        setLastDetail({ base, multiplier, bonus })
+      } else {
+        setLastDetail(null)
+      }
+    },
+    [picked, q, workplace],
+  )
 
-  const choose = (value) => {
-    if (picked !== null) return
-    setPicked(value)
-    const elapsed = Date.now() - startRef.current
-    const ok = value === q.correct
-    const { multiplier } = comboRef.current.record(ok)
-    if (ok) {
-      const base = BASE * multiplier
-      const bonus = speedBonusMs(elapsed, { fastMs: SPEED_FAST_MS, bonusPts: SPEED_BONUS })
-      setRunningTotal((t) => t + base + bonus)
-      setLastDetail({ base, multiplier, bonus })
-    } else {
-      setLastDetail(null)
-    }
-  }
+  useEffect(() => {
+    if (picked !== null || !items.length || !q) return undefined
+    const id = window.setTimeout(() => {
+      if (pickedRef.current !== null) return
+      choose(!q.correct)
+    }, TIMER_MS)
+    return () => window.clearTimeout(id)
+  }, [index, picked, items.length, q, choose])
+
+  const barPct = Math.min(100, Math.round((timerLeft / TIMER_MS) * 100))
 
   const advance = () => {
     if (isLast) {

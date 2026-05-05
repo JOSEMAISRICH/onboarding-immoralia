@@ -1,6 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import ModuleWrapper from '../components/ModuleWrapper'
 import { MINI_POINTS, paresHerramienta as defaultPairs } from '../data/minijuegos'
+import { useReportExamQuestionProgress } from '../context/ExamProgressContext'
+import { fingerprintPairs, readGameResume, writeGameResume } from '../lib/minigameResumeStorage'
 
 function shuffle(arr) {
   const copy = [...arr]
@@ -11,16 +13,50 @@ function shuffle(arr) {
   return copy
 }
 
-function MiniMatch({ onComplete, pairs = defaultPairs }) {
-  const rightShuffled = useMemo(() => shuffle(pairs.map((p) => p.use)), [pairs])
+function MiniMatch({ workplace = 'immoralia', onComplete, pairs = defaultPairs }) {
+  const fingerprint = useMemo(() => fingerprintPairs(pairs), [pairs])
+  const hydratedForFp = useRef(null)
+  const defaultRight = useMemo(() => shuffle(pairs.map((p) => p.use)), [pairs])
+
+  const [rightShuffled, setRightShuffled] = useState(defaultRight)
   const [matchedTools, setMatchedTools] = useState(() => new Set())
   const [matchedUses, setMatchedUses] = useState(() => new Set())
   const [selectedToolId, setSelectedToolId] = useState(null)
   const [wrongFlash, setWrongFlash] = useState(false)
 
+  useLayoutEffect(() => {
+    if (!pairs.length) return
+    if (hydratedForFp.current === fingerprint) return
+    hydratedForFp.current = fingerprint
+    const s = readGameResume(workplace, 'miniMatch', fingerprint)
+    const ru = s?.rightShuffled
+    const validRight =
+      Array.isArray(ru) &&
+      ru.length === pairs.length &&
+      pairs.every((p) => ru.includes(p.use)) &&
+      ru.every((u) => pairs.some((p) => p.use === u))
+    if (validRight) setRightShuffled(ru)
+    else setRightShuffled(shuffle(pairs.map((p) => p.use)))
+    setMatchedTools(new Set(Array.isArray(s?.matchedTools) ? s.matchedTools : []))
+    setMatchedUses(new Set(Array.isArray(s?.matchedUses) ? s.matchedUses : []))
+    setSelectedToolId(typeof s?.selectedToolId === 'string' ? s.selectedToolId : null)
+  }, [workplace, fingerprint, pairs])
+
+  useEffect(() => {
+    if (!pairs.length || hydratedForFp.current !== fingerprint) return
+    writeGameResume(workplace, 'miniMatch', fingerprint, {
+      rightShuffled,
+      matchedTools: [...matchedTools],
+      matchedUses: [...matchedUses],
+      selectedToolId,
+    })
+  }, [workplace, fingerprint, pairs.length, rightShuffled, matchedTools, matchedUses, selectedToolId])
+
   const maxMatch = pairs.length * MINI_POINTS.matchPerPair
   const points = matchedTools.size * MINI_POINTS.matchPerPair
   const allDone = matchedTools.size === pairs.length
+
+  useReportExamQuestionProgress(Math.min(matchedTools.size, pairs.length), pairs.length, pairs.length > 0)
 
   const tryPair = (useText) => {
     if (!selectedToolId || matchedTools.has(selectedToolId) || matchedUses.has(useText)) return

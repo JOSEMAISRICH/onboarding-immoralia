@@ -32,7 +32,7 @@ function formatElapsed(startedAt) {
 
 function Finish({
   userName,
-  workplace = 'general',
+  workplace = 'immoralia',
   totalPoints,
   maxPoints,
   scoreByModule,
@@ -46,7 +46,7 @@ function Finish({
   const medal = getScoreMedal(percentScore)
 
   const moduleKeys = Object.keys(maxByModule)
-  const workplaceLabel = WORKPLACE_OPTIONS.find((o) => o.id === workplace)?.label ?? 'General'
+  const workplaceLabel = WORKPLACE_OPTIONS.find((o) => o.id === workplace)?.label ?? 'Immoralia'
 
   return (
     <div className="text-center">
@@ -59,16 +59,16 @@ function Finish({
         </div>
       </div>
       <p
-        className="mx-auto mt-6 max-w-2xl px-2 text-3xl font-extrabold leading-[1.15] tracking-tight text-white md:text-4xl lg:text-5xl"
+        className="mx-auto mt-6 max-w-2xl px-2 text-3xl font-extrabold leading-[1.15] tracking-tight text-slate-900 md:text-4xl lg:text-5xl"
         id="finish-welcome"
       >
         {userName ? (
           <>
-            <span className="bg-gradient-to-r from-amber-200 via-rose-200 to-sky-200 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-800 via-teal-700 to-emerald-700 bg-clip-text text-transparent">
               {userName}
             </span>
             {', ya eres parte de '}
-            <span className="bg-gradient-to-r from-fuchsia-300 to-amber-200 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-800 to-teal-700 bg-clip-text text-transparent">
               Immoralia
             </span>
             .
@@ -76,34 +76,34 @@ function Finish({
         ) : (
           <>
             Ya eres parte de{' '}
-            <span className="bg-gradient-to-r from-fuchsia-300 to-amber-200 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-800 to-teal-700 bg-clip-text text-transparent">
               Immoralia
             </span>
             .
           </>
         )}
       </p>
-      <p className="mt-4 text-2xl font-semibold text-amber-100 md:text-3xl">Enhorabuena</p>
+      <p className="mt-4 text-2xl font-semibold text-teal-800 md:text-3xl">Enhorabuena</p>
 
-      <p className="mt-2 text-xs text-slate-500">
-        La medalla depende de tu <strong className="text-slate-400">puntuacion en los minijuegos</strong> (
+      <p className="mt-2 text-xs text-slate-600">
+        La medalla depende de tu <strong className="text-slate-800">puntuacion en los minijuegos</strong> (
         {percentScore}% del maximo), no del recorrido.
       </p>
-      <h2 className="mt-4 text-xl font-bold text-white md:text-2xl">Onboarding completado</h2>
+      <h2 className="mt-4 text-xl font-bold text-slate-900 md:text-2xl">Onboarding completado</h2>
 
-      <p className="mt-2 text-xs text-slate-500">
-        Espacio elegido al empezar: <strong className="text-slate-400">{workplaceLabel}</strong>
+      <p className="mt-2 text-xs text-slate-600">
+        Espacio elegido al empezar: <strong className="text-slate-800">{workplaceLabel}</strong>
       </p>
-      <p className="mt-3 text-sm text-slate-400">
-        <strong className="text-emerald-300">100% del recorrido</strong> completado (todos los modulos).
-        Tu <strong className="text-violet-300">rango Platino</strong> en la barra superior refleja haber
+      <p className="mt-3 text-sm text-slate-700">
+        <strong className="text-emerald-800">100% del recorrido</strong> completado (todos los modulos).
+        Tu <strong className="text-blue-900">rango Platino</strong> en la barra superior refleja haber
         cerrado el onboarding — bienvenida o bienvenido al equipo.
       </p>
 
-      <p className="mt-2 text-slate-300">Tu puntuacion total es:</p>
-      <p className="my-2 text-4xl font-extrabold text-cyan-200">
+      <p className="mt-2 font-medium text-slate-700">Tu puntuacion total es:</p>
+      <p className="my-2 text-4xl font-extrabold text-teal-800">
         {totalPoints} / {maxPoints} pts
-        <span className="ml-2 text-lg font-semibold text-slate-400">({percentScore}%)</span>
+        <span className="ml-2 text-lg font-semibold text-slate-600">({percentScore}%)</span>
       </p>
 
       <div
@@ -118,25 +118,25 @@ function Finish({
         ) : null}
       </div>
 
-      <p className="mt-4 text-sm text-slate-300">Tiempo empleado: {formatElapsed(startedAt)}</p>
+      <p className="mt-4 text-sm font-medium text-slate-700">Tiempo empleado: {formatElapsed(startedAt)}</p>
 
-      <div className="mx-auto mt-6 max-w-lg rounded-2xl border border-cyan-300/25 bg-slate-950/50 p-4 text-left">
-        <h3 className="text-sm font-semibold text-cyan-200">Desglose por modulo</h3>
-        <ul className="mt-2 max-h-80 space-y-2 overflow-y-auto text-sm text-slate-300">
+      <div className="mx-auto mt-6 max-w-lg rounded-2xl border border-blue-200/95 bg-gradient-to-b from-white to-slate-50/90 p-4 text-left shadow-md shadow-blue-100/40">
+        <h3 className="text-sm font-semibold text-blue-950">Desglose por modulo</h3>
+        <ul className="mt-2 max-h-80 space-y-2 overflow-y-auto text-sm text-slate-700">
           {moduleKeys.map((key) => (
             <li
               key={key}
-              className="flex flex-col gap-2 border-b border-slate-700/50 pb-2 last:border-0 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3"
+              className="flex flex-col gap-2 border-b border-slate-200 pb-2 last:border-0 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3"
             >
               <span className="min-w-0 flex-1">{labels[key] || key}</span>
               <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
-                <span className="font-mono text-cyan-100">
+                <span className="font-mono font-semibold text-blue-950 tabular-nums">
                   {scoreByModule[key] ?? 0} / {maxByModule[key]} pts
                 </span>
                 {beginReplayModule ? (
                   <button
                     type="button"
-                    className="rounded-lg border border-violet-400/45 bg-violet-950/40 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-violet-100 transition hover:bg-violet-900/50"
+                    className="rounded-lg border border-blue-300 bg-blue-600 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-white shadow-sm transition hover:bg-blue-700"
                     onClick={() => beginReplayModule(key)}
                   >
                     Mejorar mi puntuacion
@@ -149,8 +149,8 @@ function Finish({
       </div>
 
       <div className="mx-auto mt-6 max-w-lg text-left">
-        <h3 className="text-sm font-semibold text-slate-200">Proximos pasos sugeridos</h3>
-        <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-slate-400">
+        <h3 className="text-sm font-semibold text-slate-900">Proximos pasos sugeridos</h3>
+        <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-slate-700">
           <li>
             Tu avance y puntuacion quedan guardados en tu cuenta; puedes cerrar el navegador y retomar cuando
             quieras.
@@ -170,7 +170,7 @@ function Finish({
       {onReset ? (
         <button
           type="button"
-          className="mt-8 rounded-xl border border-slate-500 px-4 py-2 text-sm text-slate-300 transition hover:bg-slate-800"
+          className="mx-auto mt-10 block w-full max-w-md rounded-2xl border-2 border-slate-800 bg-slate-900 px-5 py-3.5 text-base font-bold text-white shadow-lg shadow-slate-900/25 transition hover:bg-slate-800"
           onClick={onReset}
         >
           Repetir recorrido desde el inicio

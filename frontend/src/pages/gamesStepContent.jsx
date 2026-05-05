@@ -6,15 +6,16 @@ import MiniScramble from '../modules/MiniScramble'
 import MiniTrueFalse from '../modules/MiniTrueFalse'
 import Puzzle from '../modules/Puzzle'
 import Quiz from '../modules/Quiz'
-import MiniHerramientasJuego from '../modules/MiniHerramientasJuego'
 import MiniModulo1Repaso from '../modules/MiniModulo1Repaso'
 import MiniValoresJuego from '../modules/MiniValoresJuego'
 import MiniMemory from '../modules/MiniMemory'
 import MiniScenario from '../modules/MiniScenario'
 import MiniWhoToAsk from '../modules/MiniWhoToAsk'
-import MiniWordle from '../modules/MiniWordle'
+import MiniWordleTriple from '../modules/MiniWordleTriple'
 import { EXTRA_GAME_KEYS } from '../data/extraMinijuegos10'
 import ModuleWrapper from '../components/ModuleWrapper'
+import { clearGameResume } from '../lib/minigameResumeStorage'
+import { getModuleKeyForStep } from '../lib/moduleStepMap'
 
 /**
  * Contenido principal del recorrido (/minijuegos) según paso.
@@ -23,7 +24,6 @@ export function GamesStepContent({
   stepIndex,
   finishStep,
   extraStartStep,
-  wpId,
   workplace,
   quizPreguntas,
   tfItems,
@@ -34,7 +34,7 @@ export function GamesStepContent({
   modulo1Items,
   scenarioRounds,
   memoryPairs,
-  wordleConfig,
+  wordlePool,
   whoAskRounds,
   completeAfterBeat,
   recordModuleScore,
@@ -48,6 +48,12 @@ export function GamesStepContent({
   beginReplayModule,
 }) {
   const beat = completeAfterBeat
+
+  const beatClear = (stepForModule, earnedPoints, title, updateScore) => {
+    const mk = getModuleKeyForStep(stepForModule)
+    if (mk) clearGameResume(workplace, mk)
+    beat(earnedPoints, title, updateScore)
+  }
 
   if (stepIndex === finishStep) {
     return (
@@ -72,10 +78,11 @@ export function GamesStepContent({
     return (
       <MiniExtraSingle
         key={EXTRA_GAME_KEYS[gi]}
+        workplace={workplace}
         gameIndex={gi}
         onComplete={(pts) => {
           const key = EXTRA_GAME_KEYS[gi]
-          beat(pts, `Extra ${gi + 1}`, () => recordModuleScore(key, pts))
+          beatClear(extraStartStep + gi, pts, `Extra ${gi + 1}`, () => recordModuleScore(key, pts))
         }}
       />
     )
@@ -83,21 +90,13 @@ export function GamesStepContent({
 
   switch (stepIndex) {
     case 1:
-      return wpId === 'immoralia' ? (
-        <MiniHerramientasJuego
-          onComplete={(earnedPoints) =>
-            beat(earnedPoints, 'Modulo 1: documentacion', () =>
-              () => recordModuleScore('registros', earnedPoints),
-            )
-          }
-        />
-      ) : (
+      return (
         <MiniModulo1Repaso
           workplace={workplace}
           items={modulo1Items}
           onComplete={(earnedPoints) =>
-            beat(earnedPoints, 'Modulo 1: repaso', () =>
-              () => recordModuleScore('registros', earnedPoints),
+            beatClear(1, earnedPoints, 'Modulo 1: test rapido', () => () =>
+              recordModuleScore('registros', earnedPoints),
             )
           }
         />
@@ -105,8 +104,9 @@ export function GamesStepContent({
     case 2:
       return (
         <MiniValoresJuego
+          workplace={workplace}
           onComplete={(earnedPoints) =>
-            beat(earnedPoints, 'Valores del manifiesto', () =>
+            beatClear(2, earnedPoints, 'Valores del manifiesto', () =>
               () => recordModuleScore('valores', earnedPoints),
             )
           }
@@ -115,18 +115,20 @@ export function GamesStepContent({
     case 3:
       return (
         <Quiz
+          workplace={workplace}
           questions={quizPreguntas}
           onComplete={(earnedPoints) =>
-            beat(earnedPoints, 'Gran quiz', () => () => recordModuleScore('quiz', earnedPoints))
+            beatClear(3, earnedPoints, 'Gran quiz', () => () => recordModuleScore('quiz', earnedPoints))
           }
         />
       )
     case 4:
       return (
         <Puzzle
+          workplace={workplace}
           steps={puzzleSteps}
           onComplete={(earnedPoints) =>
-            beat(earnedPoints, 'Ordena el proceso', () =>
+            beatClear(4, earnedPoints, 'Ordena el proceso', () =>
               () => recordModuleScore('puzzle', earnedPoints),
             )
           }
@@ -135,65 +137,81 @@ export function GamesStepContent({
     case 5:
       return (
         <MiniTrueFalse
+          workplace={workplace}
           items={tfItems}
           onComplete={(earned) =>
-            beat(earned, 'Verdadero o falso', () => () => recordModuleScore('miniTrueFalse', earned))
+            beatClear(5, earned, 'Verdadero o falso', () => () => recordModuleScore('miniTrueFalse', earned))
           }
         />
       )
     case 6:
       return (
         <MiniMatch
+          workplace={workplace}
           pairs={matchPairs}
           onComplete={(earned) =>
-            beat(earned, 'Empareja', () => () => recordModuleScore('miniMatch', earned))
+            beatClear(6, earned, 'Empareja', () => () => recordModuleScore('miniMatch', earned))
           }
         />
       )
     case 7:
       return (
         <MiniScramble
+          workplace={workplace}
           rounds={scrambleRounds}
           onComplete={(earned) =>
-            beat(earned, 'Palabra revuelta', () => () => recordModuleScore('miniScramble', earned))
+            beatClear(7, earned, 'Palabra revuelta', () => () => recordModuleScore('miniScramble', earned))
           }
         />
       )
     case 8:
       return (
         <MiniOddOne
+          workplace={workplace}
           questions={oddQuestions}
           onComplete={(earned) =>
-            beat(earned, 'El intruso', () => () => recordModuleScore('miniOdd', earned))
+            beatClear(8, earned, 'El intruso', () => () => recordModuleScore('miniOdd', earned))
           }
         />
       )
     case 9:
       return (
         <MiniScenario
+          workplace={workplace}
           rounds={scenarioRounds}
-          onComplete={(earned) => beat(earned, 'Escenarios', () => recordModuleScore('miniScenario', earned))}
+          onComplete={(earned) =>
+            beatClear(9, earned, 'Escenarios', () => recordModuleScore('miniScenario', earned))
+          }
         />
       )
     case 10:
       return (
         <MiniMemory
+          workplace={workplace}
           pairs={memoryPairs}
-          onComplete={(earned) => beat(earned, 'Memoria', () => recordModuleScore('miniMemory', earned))}
+          onComplete={(earned) =>
+            beatClear(10, earned, 'Memoria', () => recordModuleScore('miniMemory', earned))
+          }
         />
       )
     case 11:
       return (
-        <MiniWordle
-          config={wordleConfig}
-          onComplete={(earned) => beat(earned, 'Palabra oculta', () => recordModuleScore('miniWordle', earned))}
+        <MiniWordleTriple
+          workplace={workplace}
+          wordlePool={wordlePool}
+          onComplete={(earned) =>
+            beatClear(11, earned, 'Palabra oculta', () => recordModuleScore('miniWordle', earned))
+          }
         />
       )
     case 12:
       return (
         <MiniWhoToAsk
+          workplace={workplace}
           rounds={whoAskRounds}
-          onComplete={(earned) => beat(earned, 'A quien consultar', () => recordModuleScore('miniWhoToAsk', earned))}
+          onComplete={(earned) =>
+            beatClear(12, earned, 'A quien consultar', () => recordModuleScore('miniWhoToAsk', earned))
+          }
         />
       )
     default:

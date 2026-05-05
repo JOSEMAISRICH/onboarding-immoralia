@@ -1,12 +1,38 @@
-import { useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import ModuleWrapper from '../components/ModuleWrapper'
 import { getQuestionExplanation, getTrueFalseExplanation } from '../lib/questionExplain'
 import { EXTRA_POINTS_EACH, extraGames } from '../data/extraMinijuegos10'
+import { useReportExamQuestionProgress } from '../context/ExamProgressContext'
+import { readGameResume, resumeShortHash, writeGameResume } from '../lib/minigameResumeStorage'
 
-function MiniExtraSingle({ gameIndex, onComplete }) {
+function MiniExtraSingle({ workplace = 'immoralia', gameIndex, onComplete }) {
   const game = extraGames[gameIndex]
+  const fingerprint = useMemo(
+    () => (game ? `${game.key}:${resumeShortHash(game.question)}` : '0'),
+    [game],
+  )
+  const hydratedForFp = useRef(null)
+  const moduleKey = game?.key
+
   const [picked, setPicked] = useState(null)
   const [answered, setAnswered] = useState(false)
+
+  useLayoutEffect(() => {
+    if (!game || !moduleKey) return
+    if (hydratedForFp.current === fingerprint) return
+    hydratedForFp.current = fingerprint
+    const s = readGameResume(workplace, moduleKey, fingerprint)
+    if (!s) return
+    setPicked(s.picked === undefined || s.picked === null ? null : s.picked)
+    setAnswered(Boolean(s.answered))
+  }, [workplace, fingerprint, game, moduleKey])
+
+  useEffect(() => {
+    if (!game || !moduleKey || hydratedForFp.current !== fingerprint) return
+    writeGameResume(workplace, moduleKey, fingerprint, { picked, answered })
+  }, [workplace, moduleKey, fingerprint, picked, answered])
+
+  useReportExamQuestionProgress(0, 1, Boolean(game))
 
   if (!game) return null
 

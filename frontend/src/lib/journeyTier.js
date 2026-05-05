@@ -1,7 +1,7 @@
 /**
  * Rangos por % de avance del recorrido (pasos completados vs pantalla final).
  * No es competitivo ni ranking: solo acompañamiento, como pidió el equipo.
- * Paleta mas alegre: calidos + cielo (evitar gris plata frio).
+ * Paleta “aula”: azul + salvia + acentos cálidos (logros), sin fucsia/violeta dominantes.
  */
 import { EXTRA_GAME_KEYS } from '../data/extraMinijuegos10'
 import { EXTRA_START_STEP } from './onboardingSteps'
@@ -39,9 +39,9 @@ export function getJourneyTier(completionPercent) {
       label: 'Platino',
       emoji: '💎',
       description: 'Onboarding completado — ya formas parte de Immoralia',
-      barClass: 'from-amber-300 via-fuchsia-400 to-sky-400',
+      barClass: 'from-blue-500 via-teal-500 to-emerald-600',
       badgeClass:
-        'border-amber-300/45 bg-gradient-to-br from-amber-500/30 via-fuchsia-500/20 to-sky-500/25 text-amber-50 shadow-lg shadow-amber-900/25',
+        'border-blue-300/70 bg-gradient-to-br from-white via-blue-50 to-emerald-50 text-slate-800 shadow-md shadow-blue-200/45',
     }
   }
   if (p >= 80) {
@@ -50,9 +50,9 @@ export function getJourneyTier(completionPercent) {
       label: 'Oro',
       emoji: '🥇',
       description: 'Casi al final — sigue un poco mas',
-      barClass: 'from-yellow-300 via-amber-400 to-orange-400',
+      barClass: 'from-yellow-400 via-amber-500 to-orange-500',
       badgeClass:
-        'border-yellow-300/50 bg-gradient-to-br from-yellow-500/25 to-amber-600/30 text-amber-50',
+        'border-amber-300/70 bg-gradient-to-br from-amber-50 to-orange-50 text-slate-800 shadow-md shadow-amber-200/50',
     }
   }
   if (p >= 50) {
@@ -61,9 +61,9 @@ export function getJourneyTier(completionPercent) {
       label: 'Plata',
       emoji: '🥈',
       description: 'Vas por la mitad — buen ritmo',
-      barClass: 'from-sky-300 via-indigo-300 to-violet-300',
+      barClass: 'from-sky-400 via-blue-500 to-teal-600',
       badgeClass:
-        'border-sky-300/50 bg-gradient-to-br from-sky-500/25 to-violet-500/25 text-sky-50',
+        'border-blue-300/70 bg-gradient-to-br from-sky-50 to-blue-50 text-slate-800 shadow-md shadow-blue-200/45',
     }
   }
   if (p >= 20) {
@@ -72,9 +72,9 @@ export function getJourneyTier(completionPercent) {
       label: 'Bronce',
       emoji: '🥉',
       description: 'Primer tramo superado — sigue asi',
-      barClass: 'from-orange-400 via-amber-500 to-yellow-500',
+      barClass: 'from-orange-500 via-amber-500 to-yellow-400',
       badgeClass:
-        'border-orange-400/50 bg-gradient-to-br from-orange-600/35 to-amber-500/25 text-orange-50',
+        'border-orange-300/70 bg-gradient-to-br from-orange-50 to-amber-50 text-slate-800 shadow-md shadow-orange-200/45',
     }
   }
   return {
@@ -82,9 +82,9 @@ export function getJourneyTier(completionPercent) {
     label: 'En marcha',
     emoji: '🌱',
     description: 'Has empezado — cada paso cuenta',
-    barClass: 'from-amber-300 via-lime-300 to-sky-400',
+    barClass: 'from-emerald-500 via-teal-500 to-blue-600',
     badgeClass:
-      'border-amber-300/45 bg-gradient-to-br from-amber-500/20 via-lime-500/15 to-sky-500/20 text-amber-50',
+      'border-emerald-300/70 bg-gradient-to-br from-emerald-50 via-teal-50 to-blue-50 text-slate-800 shadow-md shadow-emerald-200/35',
   }
 }
 

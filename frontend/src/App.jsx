@@ -1,5 +1,5 @@
-import { lazy, Suspense } from 'react'
-import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom'
+import { lazy, Suspense, useEffect } from 'react'
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import PlayfulBackdrop from './components/PlayfulBackdrop'
 import StepCompleteOverlay from './components/StepCompleteOverlay'
 import { OnboardingProvider, useOnboarding } from './context/OnboardingContext'
@@ -13,8 +13,9 @@ const SopDetailPage = lazy(() => import('./pages/SopDetailPage'))
 
 function RouteFallback() {
   return (
-    <div className="flex min-h-[50vh] items-center justify-center text-sm text-slate-400">
-      Cargando…
+    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-2 text-sm text-slate-600">
+      <span className="inline-block h-8 w-8 animate-pulse rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 opacity-85" aria-hidden />
+      <span>Cargando…</span>
     </div>
   )
 }
@@ -52,9 +53,14 @@ function SyncAndCelebrationLayer({ children }) {
 }
 
 function AppRoutes() {
+  const location = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
+
   return (
     <SyncAndCelebrationLayer>
-      <div className="min-h-screen">
+      <div key={location.pathname} className="route-page-enter min-h-screen">
         <PlayfulBackdrop />
         <Suspense fallback={<RouteFallback />}>
           <Routes>

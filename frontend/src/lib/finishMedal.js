@@ -31,7 +31,7 @@ export function getScoreMedal(percentScore) {
       ringClass:
         'ring-4 ring-amber-300/80 shadow-[0_0_40px_rgba(251,191,36,0.35)] bg-gradient-to-br from-amber-400/30 to-yellow-600/20',
       cardClass:
-        'border-amber-400/50 bg-gradient-to-br from-amber-500/30 via-yellow-500/15 to-amber-700/20',
+        'border-amber-500/55 bg-gradient-to-br from-amber-900/85 via-amber-950/80 to-slate-950/90',
       textClass: 'text-amber-50',
     }
   }
@@ -45,7 +45,7 @@ export function getScoreMedal(percentScore) {
       tone: 'gold',
       ringClass:
         'ring-4 ring-amber-400/70 shadow-[0_0_32px_rgba(245,158,11,0.3)] bg-gradient-to-br from-amber-500/35 to-orange-700/25',
-      cardClass: 'border-amber-500/45 bg-gradient-to-br from-amber-600/25 to-orange-900/30',
+      cardClass: 'border-amber-500/50 bg-gradient-to-br from-amber-900/80 to-orange-950/85',
       textClass: 'text-amber-50',
     }
   }

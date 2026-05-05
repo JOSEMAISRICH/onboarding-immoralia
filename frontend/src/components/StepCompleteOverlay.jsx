@@ -59,7 +59,7 @@ function StepCompleteOverlay({ fromStep, newTierId, onContinue }) {
           <p className="text-xs font-medium uppercase tracking-wide text-amber-300/90">
             Recorrido ahora
           </p>
-          <JourneyRing percent={previewPercent} size={88} stroke={6} />
+          <JourneyRing percent={previewPercent} size={88} stroke={6} tone="dark" />
         </div>
         <button
           type="button"

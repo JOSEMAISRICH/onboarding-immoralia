@@ -1,6 +1,8 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import ModuleWrapper from '../components/ModuleWrapper'
 import { MEMORY_PTS_PER_PAIR } from '../data/workplaceMiniNewFour'
+import { useReportExamQuestionProgress } from '../context/ExamProgressContext'
+import { fingerprintPairs, readGameResume, writeGameResume } from '../lib/minigameResumeStorage'
 
 function shuffle(arr) {
   const a = [...arr]
@@ -13,47 +15,102 @@ function shuffle(arr) {
 
 /** @typedef {{ pairId: string, label: string, side: 'L'|'R' }} Card */
 
-/** @param {{ onComplete: (pts: number) => void, pairs: { id: string, left: string, right: string }[] }} props */
-function MiniMemory({ onComplete, pairs }) {
-  const cards = useMemo(() => {
-    /** @type {Card[]} */
-    const built = []
-    pairs.forEach((p) => {
-      built.push({ pairId: p.id, label: p.left, side: 'L' })
-      built.push({ pairId: p.id, label: p.right, side: 'R' })
-    })
-    return shuffle(built)
-  }, [pairs])
+function buildShuffledCards(pairList) {
+  /** @type {Card[]} */
+  const built = []
+  pairList.forEach((p) => {
+    built.push({ pairId: p.id, label: p.left, side: 'L' })
+    built.push({ pairId: p.id, label: p.right, side: 'R' })
+  })
+  return shuffle(built)
+}
 
+function validateSavedCards(savedCards, pairList) {
+  if (!savedCards || savedCards.length !== pairList.length * 2) return false
+  const counts = {}
+  for (const p of pairList) {
+    counts[p.id] = { L: false, R: false }
+  }
+  for (const c of savedCards) {
+    if (!c.pairId || (c.side !== 'L' && c.side !== 'R')) return false
+    const pair = pairList.find((p) => p.id === c.pairId)
+    if (!pair) return false
+    if (c.side === 'L' && c.label !== pair.left) return false
+    if (c.side === 'R' && c.label !== pair.right) return false
+    counts[c.pairId][c.side] = true
+  }
+  return Object.values(counts).every((x) => x.L && x.R)
+}
+
+/** @param {{ workplace?: string, onComplete: (pts: number) => void, pairs: { id: string, left: string, right: string }[] }} props */
+function MiniMemory({ workplace = 'immoralia', onComplete, pairs }) {
+  const fingerprint = useMemo(() => fingerprintPairs(pairs), [pairs])
+  const hydratedForFp = useRef(null)
+  const completionSentRef = useRef(false)
+
+  const [cards, setCards] = useState(() => buildShuffledCards(pairs))
   const [flipped, setFlipped] = useState(/** @type {number[]} */ ([]))
   const [matched, setMatched] = useState(/** @type {Record<string, boolean>} */ ({}))
   const [locked, setLocked] = useState(false)
 
-  const matchedCount = Object.keys(matched).filter((k) => matched[k]).length / 2
-  const earned = Math.floor(matchedCount) * MEMORY_PTS_PER_PAIR
+  useLayoutEffect(() => {
+    if (!pairs.length) return
+    if (hydratedForFp.current === fingerprint) return
+    hydratedForFp.current = fingerprint
+    completionSentRef.current = false
+    const s = readGameResume(workplace, 'miniMemory', fingerprint)
+    if (s?.cards && validateSavedCards(s.cards, pairs)) {
+      setCards(s.cards)
+      setMatched(typeof s.matched === 'object' && s.matched ? { ...s.matched } : {})
+      setFlipped(Array.isArray(s.flipped) ? s.flipped : [])
+      setLocked(Boolean(s.locked))
+      return
+    }
+    setCards(buildShuffledCards(pairs))
+    setMatched({})
+    setFlipped([])
+    setLocked(false)
+  }, [workplace, fingerprint, pairs])
+
+  useEffect(() => {
+    if (!pairs.length || hydratedForFp.current !== fingerprint) return
+    writeGameResume(workplace, 'miniMemory', fingerprint, { cards, matched, flipped, locked })
+  }, [workplace, fingerprint, pairs.length, cards, matched, flipped, locked])
+
+  /** Una entrada true por par emparejado (clave = pairId), no dos. */
+  const matchedCount = Object.keys(matched).filter((k) => matched[k]).length
+  const earned = matchedCount * MEMORY_PTS_PER_PAIR
   const maxPts = pairs.length * MEMORY_PTS_PER_PAIR
   const done = matchedCount >= pairs.length
 
-  const flip = useCallback(
+  useEffect(() => {
+    if (!pairs.length || hydratedForFp.current !== fingerprint) return
+    if (matchedCount < pairs.length) return
+    if (completionSentRef.current) return
+    completionSentRef.current = true
+    queueMicrotask(() => onComplete(pairs.length * MEMORY_PTS_PER_PAIR))
+  }, [matchedCount, pairs.length, fingerprint, onComplete])
+
+  const pairsMatched = useMemo(
+    () => Object.keys(matched).filter((k) => matched[k]).length,
+    [matched],
+  )
+  useReportExamQuestionProgress(Math.min(pairsMatched, pairs.length), pairs.length, pairs.length > 0)
+
+  const flipStable = useCallback(
     (idx) => {
-      if (locked || flipped.includes(idx) || matched[cards[idx].pairId]) return
+      if (locked || flipped.includes(idx) || matched[cards[idx]?.pairId]) return
       const next = [...flipped, idx]
       if (next.length === 1) {
         setFlipped(next)
         return
       }
+      setFlipped(next)
       const [a, b] = next
       const ca = cards[a]
       const cb = cards[b]
       if (ca.pairId === cb.pairId && ca.side !== cb.side) {
-        setMatched((m) => {
-          const nm = { ...m, [ca.pairId]: true }
-          const pairsDone = Object.keys(nm).filter((k) => nm[k]).length / 2
-          if (pairsDone >= pairs.length) {
-            queueMicrotask(() => onComplete(pairs.length * MEMORY_PTS_PER_PAIR))
-          }
-          return nm
-        })
+        setMatched((m) => ({ ...m, [ca.pairId]: true }))
         setFlipped([])
       } else {
         setLocked(true)
@@ -63,7 +120,7 @@ function MiniMemory({ onComplete, pairs }) {
         }, 700)
       }
     },
-    [cards, flipped, locked, matched, matchedCount, onComplete, pairs.length],
+    [cards, flipped, locked, matched, pairs.length],
   )
 
   return (
@@ -72,7 +129,7 @@ function MiniMemory({ onComplete, pairs }) {
       subtitle={`Empareja cada concepto con su pareja. ${MEMORY_PTS_PER_PAIR} pts por par. Max ${maxPts} pts.`}
     >
       <p className="mb-3 text-sm text-slate-400">
-        Pares encontrados: {Math.floor(matchedCount)} / {pairs.length} · Puntos: {earned}
+        Pares encontrados: {matchedCount} / {pairs.length} · Puntos: {earned}
       </p>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {cards.map((c, idx) => {
@@ -82,7 +139,7 @@ function MiniMemory({ onComplete, pairs }) {
               key={`${c.pairId}-${idx}`}
               type="button"
               disabled={locked || done}
-              onClick={() => flip(idx)}
+              onClick={() => flipStable(idx)}
               className={`flex min-h-[72px] items-center justify-center rounded-xl border px-2 py-3 text-center text-sm font-semibold transition ${
                 isOpen
                   ? matched[c.pairId]

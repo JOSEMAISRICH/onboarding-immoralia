@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import ModuleWrapper from '../components/ModuleWrapper'
 import MiniConfetti from '../components/MiniConfetti'
 import { MINI_POINTS, palabrasRevueltas as defaultRounds } from '../data/minijuegos'
+import { useReportExamQuestionProgress } from '../context/ExamProgressContext'
+import { fingerprintScrambleRounds, readGameResume, writeGameResume } from '../lib/minigameResumeStorage'
 
 function shuffleLetters(str, seed = 0) {
   const arr = str.split('')
@@ -14,7 +16,10 @@ function shuffleLetters(str, seed = 0) {
   return arr
 }
 
-function MiniScramble({ onComplete, rounds = defaultRounds }) {
+function MiniScramble({ workplace = 'immoralia', onComplete, rounds = defaultRounds }) {
+  const fingerprint = useMemo(() => fingerprintScrambleRounds(rounds), [rounds])
+  const hydratedForFp = useRef(null)
+
   const [index, setIndex] = useState(0)
   const [score, setScore] = useState(0)
   const [pool, setPool] = useState([])
@@ -22,10 +27,29 @@ function MiniScramble({ onComplete, rounds = defaultRounds }) {
   const [phase, setPhase] = useState('play')
   const [showConfetti, setShowConfetti] = useState(false)
 
+  useLayoutEffect(() => {
+    if (!rounds.length) return
+    if (hydratedForFp.current === fingerprint) return
+    hydratedForFp.current = fingerprint
+    const s = readGameResume(workplace, 'miniScramble', fingerprint)
+    if (!s) return
+    const qi =
+      typeof s.index === 'number' ? Math.max(0, Math.min(s.index, rounds.length - 1)) : 0
+    setIndex(qi)
+    setScore(typeof s.score === 'number' ? s.score : 0)
+  }, [workplace, fingerprint, rounds])
+
+  useEffect(() => {
+    if (!rounds.length || hydratedForFp.current !== fingerprint) return
+    writeGameResume(workplace, 'miniScramble', fingerprint, { index, score })
+  }, [workplace, fingerprint, rounds.length, index, score])
+
   const q = rounds[index]
   const answer = (q.answer || q.options[q.correctIndex] || '').trim()
   const isLast = index === rounds.length - 1
   const maxScr = rounds.length * MINI_POINTS.scramblePerHit
+
+  useReportExamQuestionProgress(index, rounds.length, rounds.length > 0)
 
   const resetRound = useCallback(() => {
     const letters = shuffleLetters(answer.replace(/\s/g, ''), q.id || index)

@@ -1,11 +1,11 @@
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useOnboarding } from '../context/OnboardingContext'
+import SopsNavLink from '../components/SopsNavLink'
 import { DOC_TOPIC_IDS } from '../data/docTopicOrder'
 import { normalizeWorkplaceId } from '../data/workplace'
-import { recordTheoryFichaQuizScore } from '../lib/theoryFichaStorage'
 import DocTopicView from '../modules/DocTopicView'
 
-/** Ficha dedicada bajo /teoria/ficha: lectura + repaso corto; puntuacion guardada en localStorage. */
+/** Ficha bajo /teoria/ficha: solo lectura (sin repaso con preguntas). */
 function TheoryFichaPage() {
   const { userName, workplace } = useOnboarding()
   const { topicId } = useParams()
@@ -29,12 +29,15 @@ function TheoryFichaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950/95 p-4">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50/70 via-[#faf8f5] to-emerald-50/35 p-4">
+      <div className="mx-auto mb-3 flex max-w-4xl justify-end">
+        <SopsNavLink />
+      </div>
       <DocTopicView
         topicId={topicId}
-        libraryMode={false}
+        libraryMode
         onBack={() => navigate('/teoria', { preventScrollReset: true })}
-        onTopicComplete={(id, pts) => recordTheoryFichaQuizScore(id, pts)}
+        onTopicComplete={() => {}}
       />
     </div>
   )

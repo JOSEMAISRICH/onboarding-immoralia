@@ -7,6 +7,7 @@ import {
   postOnboardingStart,
 } from '../api/onboarding'
 import { EXTRA_GAME_KEYS, EXTRA_POINTS_EACH } from '../data/extraMinijuegos10'
+import { normalizeWorkplaceId } from '../data/workplace'
 import { getLearningUnits } from '../data/learningUnits'
 import { getJourneyCompletionPercent, getTierIdForStep } from '../lib/journeyTier'
 import { getStreakState, recordVisitToday } from '../lib/learningStreak'
@@ -15,6 +16,8 @@ import { FINISH_STEP } from '../lib/onboardingSteps'
 import { clearProgress, loadProgress, saveProgress } from '../lib/progressStorage'
 import { getStepIndexForModuleKey } from '../lib/moduleStepMap'
 import { getMaxByModuleForWorkplace } from '../lib/workplacePack'
+import { clearSeenQuestionsForWorkplace } from '../lib/seenQuestionsStore'
+import { clearWordlePackSession } from '../lib/wordlePackSession'
 
 function readLocalProgressState() {
   const raw = loadProgress()
@@ -22,7 +25,7 @@ function readLocalProgressState() {
     return {
       stepIndex: 0,
       userName: '',
-      workplace: 'general',
+      workplace: 'immoralia',
       startedAt: null,
       scoreByModule: emptyScores(),
     }
@@ -47,7 +50,10 @@ export function OnboardingProvider({ children }) {
   const [stepIndex, setStepIndex] = useState(() => initialLocal?.stepIndex ?? 0)
   const [userName, setUserName] = useState(() => initialLocal?.userName ?? '')
   const [workplace, setWorkplace] = useState(
-    () => /** @type {'general' | 'immoralia' | 'imcontent' | 'immedia'} */ (initialLocal?.workplace ?? 'general'),
+    () =>
+      /** @type {'immoralia' | 'imcontent' | 'immedia'} */ (
+        initialLocal?.workplace ?? 'immoralia'
+      ),
   )
   const [startedAt, setStartedAt] = useState(() => initialLocal?.startedAt ?? null)
   const [scoreByModule, setScoreByModule] = useState(() => initialLocal?.scoreByModule ?? emptyScores())
@@ -83,15 +89,16 @@ export function OnboardingProvider({ children }) {
 
       if (r.ok && r.data && !r.notFound) {
         const p = r.data
+        const wp = normalizeWorkplaceId(p.workplace)
         setStepIndex(p.stepIndex)
         setUserName(p.userName)
-        setWorkplace(p.workplace)
+        setWorkplace(wp)
         setStartedAt(p.startedAt)
         setScoreByModule(p.scoreByModule)
         saveProgress({
           stepIndex: p.stepIndex,
           userName: p.userName,
-          workplace: p.workplace,
+          workplace: wp,
           startedAt: p.startedAt,
           scoreByModule: p.scoreByModule,
         })
@@ -235,29 +242,35 @@ export function OnboardingProvider({ children }) {
   const beginReplayModule = useCallback((moduleKey) => {
     const step = getStepIndexForModuleKey(moduleKey)
     if (step == null) return
+    if (moduleKey === 'miniWordle') clearWordlePackSession(workplace)
     replayReturnStepRef.current = FINISH_STEP
     setPendingCelebration(null)
     setStepIndex(step)
-  }, [])
+  }, [workplace])
 
   const handleReset = useCallback(async () => {
+    clearSeenQuestionsForWorkplace(normalizeWorkplaceId(workplace))
+    clearWordlePackSession(workplace)
     if (apiOn) {
       await deleteOnboardingProgress()
     }
     clearProgress()
     setStepIndex(0)
     setUserName('')
-    setWorkplace('general')
+    setWorkplace('immoralia')
     setStartedAt(null)
     setScoreByModule(emptyScores())
     setPendingCelebration(null)
     replayReturnStepRef.current = null
     setSyncError(false)
-  }, [apiOn])
+  }, [apiOn, workplace])
 
   /** Tras bienvenida: stepIndex 0; la ruta /teoria es obligatoria antes de /minijuegos */
   const handleWelcomeSubmit = useCallback(
     async ({ userName: name, workplace: wp }) => {
+      const wpId = normalizeWorkplaceId(wp)
+      clearSeenQuestionsForWorkplace(wpId)
+      clearWordlePackSession(wpId)
       clearProgress()
       if (apiOn) {
         const r = await postOnboardingStart(name)
@@ -269,7 +282,7 @@ export function OnboardingProvider({ children }) {
       }
       replayReturnStepRef.current = null
       setUserName(name)
-      setWorkplace(wp)
+      setWorkplace(normalizeWorkplaceId(wp))
       setStartedAt(Date.now())
       setScoreByModule(emptyScores())
       setStepIndex(0)

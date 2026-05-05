@@ -7,17 +7,17 @@ const CHEER_LINES = [
   'Psst… la siguiente te va a gustar.',
 ]
 
-/** Capítulo 0: siempre teoría antes que minijuegos. */
+/** Capítulo 0: teoría en biblioteca antes del examen interactivo. */
 const THEORY_CHAPTER = {
   stepIndex: 0,
   title: 'Teoría y biblioteca',
-  objective: 'Lee el contexto de tu espacio y las fichas. Siempre el primer paso.',
+  objective: 'Lee el contexto de tu espacio en la biblioteca de teoría. Es el paso previo al examen.',
   minutes: 15,
   emoji: '📚',
 }
 
 /**
- * Camino tipo mapa: capítulos enlazables (nueva pestaña) + estado en el recorrido actual.
+ * Camino tipo mapa: estado del recorrido (solo lectura; no enlaza rutas).
  * @param {{ units: Array<{ stepIndex: number, title: string, objective: string, minutes: number, emoji: string }>, currentStep: number }} props
  */
 function LearningPath({ units, currentStep, compact = false }) {
@@ -25,19 +25,7 @@ function LearningPath({ units, currentStep, compact = false }) {
   const cheerIndex =
     units.length > 0 ? Math.abs(currentStep * 13 + units.length) % CHEER_LINES.length : 0
 
-  const { theoryHref, minijuegosHref } = useMemo(() => {
-    const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
-    const origin = typeof window !== 'undefined' ? window.location.origin : ''
-    const root = `${origin}${base}`
-    return {
-      theoryHref: `${root}/teoria`,
-      minijuegosHref: `${root}/minijuegos`,
-    }
-  }, [])
-
   const fullUnits = useMemo(() => [THEORY_CHAPTER, ...units], [units])
-
-  const chapterHref = (stepIndex) => (stepIndex === 0 ? theoryHref : minijuegosHref)
 
   useEffect(() => {
     currentRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
@@ -45,29 +33,28 @@ function LearningPath({ units, currentStep, compact = false }) {
 
   return (
     <section
-      className={`rounded-2xl border border-violet-400/30 bg-gradient-to-b from-indigo-950/70 via-indigo-950/50 to-slate-950/60 shadow-inner shadow-violet-950/25 backdrop-blur-sm ${compact ? 'p-3' : 'p-4'}`}
+      className={`rounded-2xl border border-blue-100/95 bg-gradient-to-b from-white via-blue-50/50 to-emerald-50/40 shadow-inner shadow-blue-100/25 backdrop-blur-sm ${compact ? 'p-3' : 'p-4'}`}
       aria-label="Camino de aprendizaje"
     >
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-2 border-b border-violet-500/20 pb-3">
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-2 border-b border-blue-100/80 pb-3">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-violet-200/85">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-blue-800/90">
             Rango del recorrido
           </p>
-          <h3 className={`mt-1 flex flex-wrap items-center gap-2 font-bold text-amber-50 md:text-xl ${compact ? 'text-base' : 'text-lg'}`}>
+          <h3 className={`mt-1 flex flex-wrap items-center gap-2 font-bold text-slate-900 md:text-xl ${compact ? 'text-base' : 'text-lg'}`}>
             <span className="animate-emoji-pop inline-block text-2xl" aria-hidden>
               🗺️
             </span>
             Mapa de capítulos
           </h3>
         </div>
-        <span className="rounded-full border border-violet-400/35 bg-violet-500/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-violet-100/95">
-          Clic → nueva pestaña
+        <span className="rounded-full border border-blue-200/90 bg-blue-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-blue-900">
+          Solo estado
         </span>
       </div>
-      <p className="mb-2 text-sm font-semibold text-fuchsia-200/90">{CHEER_LINES[cheerIndex]}</p>
-      <p className="mb-5 text-xs leading-relaxed text-violet-100/75 md:text-sm">
-        Cada bloque abre la ruta en otra pestaña (como el enlace de teoría en la barra). Así puedes consultar un
-        capítulo sin perder donde ibas. Lo que te falta por descubrir va con candado en tu sesión principal.
+      <p className="mb-2 text-sm font-semibold text-blue-800">{CHEER_LINES[cheerIndex]}</p>
+      <p className="mb-5 text-xs leading-relaxed text-slate-600 md:text-sm">
+        Vista de lo que ya completaste y lo que sigue en tu sesión principal. No es navegación: usa la barra superior y los botones del flujo para ir a teoría o minijuegos.
       </p>
 
       <div className={compact ? 'max-h-[min(260px,38vh)] overflow-y-auto overflow-x-hidden pr-1' : 'max-h-[min(420px,52vh)] overflow-y-auto overflow-x-hidden pr-1'}>
@@ -78,7 +65,6 @@ function LearningPath({ units, currentStep, compact = false }) {
             const isLocked = currentStep < u.stepIndex
             const last = i === fullUnits.length - 1
             const prevDone = i > 0 && currentStep > fullUnits[i - 1].stepIndex
-            const href = chapterHref(u.stepIndex)
 
             return (
               <li
@@ -89,7 +75,7 @@ function LearningPath({ units, currentStep, compact = false }) {
                 <div className="flex w-11 shrink-0 flex-col items-center">
                   {i > 0 ? (
                     <div
-                      className={`h-4 w-0.5 ${prevDone ? 'bg-emerald-500/55' : 'bg-slate-600/45'}`}
+                      className={`h-4 w-0.5 ${prevDone ? 'bg-emerald-400/70' : 'bg-slate-300/80'}`}
                       aria-hidden
                     />
                   ) : null}
@@ -97,10 +83,10 @@ function LearningPath({ units, currentStep, compact = false }) {
                     ref={isCurrent ? currentRef : undefined}
                     className={`flex h-10 w-10 items-center justify-center rounded-full border-2 text-lg transition ${
                       isCurrent
-                        ? 'animate-wiggle-soft border-amber-400 bg-amber-500/30 shadow-[0_0_22px_rgba(251,191,36,0.45)]'
+                        ? 'animate-wiggle-soft border-amber-500 bg-amber-100 shadow-[0_0_18px_rgba(251,191,36,0.55)]'
                         : isDone
-                          ? 'border-emerald-400/70 bg-emerald-500/25 text-emerald-100'
-                          : 'border-slate-600 bg-slate-900/80 text-slate-500'
+                          ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
+                          : 'border-slate-300 bg-white text-slate-400'
                     }`}
                     aria-current={isCurrent ? 'step' : undefined}
                   >
@@ -108,41 +94,35 @@ function LearningPath({ units, currentStep, compact = false }) {
                   </div>
                   {!last ? (
                     <div
-                      className={`mt-0 min-h-[2.75rem] w-0.5 flex-1 ${isDone ? 'bg-emerald-500/45' : 'bg-slate-600/40'}`}
+                      className={`mt-0 min-h-[2.75rem] w-0.5 flex-1 ${isDone ? 'bg-emerald-300/80' : 'bg-slate-200/90'}`}
                       aria-hidden
                     />
                   ) : null}
                 </div>
 
-                <a
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`group mb-5 min-w-0 flex-1 rounded-xl border px-3 py-2.5 text-left shadow-sm transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 ${
+                <div
+                  className={`mb-5 min-w-0 flex-1 rounded-xl border px-3 py-2.5 text-left shadow-sm transition hover:shadow-md ${
                     isCurrent
-                      ? 'border-amber-400/70 bg-gradient-to-br from-amber-500/30 to-violet-900/30 ring-2 ring-amber-400/35'
+                      ? 'border-amber-400/90 bg-gradient-to-br from-amber-50 to-orange-50 ring-2 ring-amber-300/60'
                       : isDone
-                        ? 'border-emerald-500/35 bg-emerald-950/25 hover:border-emerald-400/50'
-                        : 'border-slate-600/60 bg-slate-950/50 hover:border-violet-400/40 hover:bg-slate-900/70'
-                  } ${isLocked ? 'opacity-85' : ''}`}
+                        ? 'border-emerald-200 bg-emerald-50/80'
+                        : 'border-slate-200 bg-white/90'
+                  } ${isLocked ? 'opacity-80' : ''}`}
                 >
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-violet-200/90">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-blue-800/95">
                     Capítulo {i + 1} · ~{u.minutes} min
                   </p>
-                  <p className="mt-1 text-base font-bold leading-snug text-white md:text-lg">{u.title}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-400 group-hover:text-slate-300">
-                    {u.objective}
-                  </p>
-                  <p className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-semibold text-violet-200/90">
-                    <span className="rounded-md bg-violet-500/20 px-2 py-0.5">↗ Abrir en pestaña nueva</span>
+                  <p className="mt-1 text-base font-bold leading-snug text-slate-900 md:text-lg">{u.title}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">{u.objective}</p>
+                  <p className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-semibold text-blue-900">
                     {isCurrent ? (
-                      <span className="rounded-md bg-amber-500/20 px-2 py-0.5 text-amber-100">Tu sesión aquí</span>
+                      <span className="rounded-md bg-amber-200/80 px-2 py-0.5 text-amber-950">Tu sesión aquí</span>
                     ) : null}
                     {isLocked ? (
                       <span className="text-slate-500">En la pestaña principal: completa lo anterior</span>
                     ) : null}
                   </p>
-                </a>
+                </div>
               </li>
             )
           })}
