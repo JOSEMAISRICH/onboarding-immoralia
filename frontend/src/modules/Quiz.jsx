@@ -221,7 +221,7 @@ function Quiz({
                 }
                 return (
                   <button
-                    key={option}
+                    key={`quiz-${questionIndex}-opt-${optionIndex}`}
                     type="button"
                     className={className}
                     onClick={() => selectAnswer(optionIndex)}

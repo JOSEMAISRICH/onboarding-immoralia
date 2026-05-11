@@ -22,16 +22,17 @@ export function getLearningUnits(finishStepIndex) {
     {
       stepIndex: 2,
       title: 'Valores del manifiesto',
-      objective: 'Reconocer valores y como se traducen en el equipo.',
-      minutes: 4,
+      objective: 'Diez preguntas rapidas: enlazar frases y situaciones con Servicio, Transparencia, Innovacion y Resultados.',
+      minutes: 6,
       emoji: '💎',
     },
     {
       stepIndex: 3,
-      title: 'Gran quiz',
-      objective: 'Cultura y procesos con feedback al instante.',
-      minutes: 6,
-      emoji: '🧠',
+      title: 'El ahorcado',
+      objective:
+        'Siete palabras sobre herramientas y apps del dia a dia: adivina letra a letra, sin tiempo limite y con pista siempre visible.',
+      minutes: 8,
+      emoji: '🔠',
     },
     {
       stepIndex: 4,

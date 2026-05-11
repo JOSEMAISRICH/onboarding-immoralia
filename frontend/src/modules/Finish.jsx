@@ -5,7 +5,7 @@ import { getScoreMedal } from '../lib/finishMedal'
 const baseLabels = {
   registros: 'Modulo 1: Documentacion interna (fichas + repaso)',
   valores: 'Minijuego 2: Valores del manifiesto',
-  quiz: 'Minijuego 3: Gran quiz cultura y procesos',
+  quiz: 'Minijuego 3: El ahorcado (herramientas)',
   puzzle: 'Minijuego 4: Ordena el proceso',
   miniTrueFalse: 'Minijuego: Verdadero / falso',
   miniMatch: 'Minijuego: Empareja rol',

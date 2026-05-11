@@ -104,7 +104,7 @@ function MiniModulo1Repaso({ workplace = 'immoralia', items, onComplete }) {
             }
             return (
               <button
-                key={opt}
+                key={`m1-${index}-opt-${optIdx}`}
                 type="button"
                 className={cls}
                 disabled={answered}

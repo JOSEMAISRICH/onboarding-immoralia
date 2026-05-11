@@ -1,6 +1,6 @@
 function ModuleWrapper({ title, subtitle, children }) {
   return (
-    <section className="module-playful-shell animate-fade-up relative overflow-hidden rounded-3xl border border-blue-100/95 bg-white/94 p-6 pb-8 shadow-lg shadow-blue-100/50 backdrop-blur-sm md:p-8">
+    <section className="module-playful-shell animate-fade-up relative rounded-3xl border border-blue-100/95 bg-white/94 p-6 pb-8 shadow-lg shadow-blue-100/50 backdrop-blur-sm md:p-8">
       <span
         className="pointer-events-none absolute -right-6 -top-6 text-6xl opacity-[0.12] select-none"
         aria-hidden

@@ -10,7 +10,7 @@ export const STEPS = [
   'Welcome',
   'MiniHerramientas',
   'MiniValores',
-  'Quiz',
+  'Hangman',
   'Puzzle',
   'MiniTrueFalse',
   'MiniMatch',

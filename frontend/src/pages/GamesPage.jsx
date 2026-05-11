@@ -10,6 +10,7 @@ import { getUnitForStep } from '../data/learningUnits'
 import { EXTRA_GAME_KEYS } from '../data/extraMinijuegos10'
 import { WORKPLACE_OPTIONS, normalizeWorkplaceId } from '../data/workplace'
 import {
+  getHangmanBank,
   getMemoryPairs,
   getModulo1RepasoItems,
   getPalabrasRevueltas,
@@ -24,9 +25,9 @@ import {
 } from '../lib/workplacePack'
 import { mergeQuizQuestions, mergeTrueFalseItems } from '../lib/contentMerge'
 import {
+  prepareHangmanRounds,
   prepareModulo1Items,
   prepareOddItems,
-  prepareQuizItems,
   prepareScrambleRounds,
   prepareTrueFalseItems,
 } from '../lib/examQuestionSelection'
@@ -153,7 +154,8 @@ function GamesPage() {
     () => mergeQuizQuestions(getQuizPreguntas(workplace), remoteContent, wpId),
     [workplace, remoteContent, wpId],
   )
-  const quizPrepared = useMemo(() => prepareQuizItems(wpId, quizPreguntas), [wpId, quizPreguntas])
+  const hangmanBank = useMemo(() => getHangmanBank(workplace), [workplace])
+  const hangmanPrepared = useMemo(() => prepareHangmanRounds(wpId, hangmanBank), [wpId, hangmanBank])
   const warmupQuestion = useMemo(
     () => (quizPreguntas.length > 0 ? quizPreguntas[0] : EXAM_WARMUP_FALLBACK),
     [quizPreguntas],
@@ -185,7 +187,7 @@ function GamesPage() {
     () =>
       buildExamProgressPlan({
         modulo1Len: modulo1Items.length,
-        quizLen: quizPrepared.length,
+        quizLen: hangmanPrepared.length,
         puzzleLen: puzzleSteps.length,
         tfLen: tfItems.length,
         matchLen: matchPairs.length,
@@ -198,7 +200,7 @@ function GamesPage() {
       }),
     [
       modulo1Items.length,
-      quizPrepared.length,
+      hangmanPrepared.length,
       puzzleSteps.length,
       tfItems.length,
       matchPairs.length,
@@ -302,10 +304,10 @@ function GamesPage() {
                     Examen interactivo
                   </p>
                   <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-                    Modo test: preguntas, tiempo y puntos
+                    Modo test: retos variados y puntos
                   </h2>
                   <p className="mt-3 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">
-                    Tests de opción múltiple, verdadero/falso y retos con feedback al momento.{' '}
+                    Tests de opción múltiple, verdadero/falso, ahorcado sin tiempo y otros retos con feedback al momento.{' '}
                     <Link to="/teoria" className="font-semibold text-blue-800 underline-offset-2 hover:text-blue-950 hover:underline">
                       Teoría
                     </Link>
@@ -319,7 +321,10 @@ function GamesPage() {
                       Verdadero / falso
                     </li>
                     <li className="rounded-xl border border-blue-200 bg-blue-50/90 px-3 py-2 text-xs font-semibold text-blue-950 md:text-sm">
-                      Cronómetro en varios retos
+                      Ahorcado sin tiempo
+                    </li>
+                    <li className="rounded-xl border border-blue-200 bg-blue-50/90 px-3 py-2 text-xs font-semibold text-blue-950 md:text-sm">
+                      Cronómetro solo en algunos retos
                     </li>
                     <li className="rounded-xl border border-blue-200 bg-blue-50/90 px-3 py-2 text-xs font-semibold text-blue-950 md:text-sm">
                       Puntos y rachas
@@ -413,7 +418,7 @@ function GamesPage() {
               finishStep={FINISH_STEP}
               extraStartStep={EXTRA_START_STEP}
               workplace={workplace}
-              quizPreguntas={quizPrepared}
+              hangmanRounds={hangmanPrepared}
               tfItems={tfItems}
               matchPairs={matchPairs}
               scrambleRounds={scrambleRounds}

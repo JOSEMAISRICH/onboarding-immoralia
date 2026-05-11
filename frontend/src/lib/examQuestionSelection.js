@@ -48,8 +48,17 @@ export function toolsPriorityScore(text) {
 export function prepareExamQuestionPool(workplace, items, getQuestionText, maxCount) {
   const wp = normalizeWorkplaceId(workplace)
   if (!items?.length) return []
+  /** Evita el mismo enunciado dos veces en una sesión por datos duplicados en el banco. */
+  const dedupKeys = new Set()
+  const deduped = []
+  for (const item of items) {
+    const k = normalizeQuestionKey(getQuestionText(item))
+    if (!k || dedupKeys.has(k)) continue
+    dedupKeys.add(k)
+    deduped.push(item)
+  }
   const seen = loadSeenQuestionKeys(wp)
-  let pool = items.filter((item) => !seen.has(normalizeQuestionKey(getQuestionText(item))))
+  let pool = deduped.filter((item) => !seen.has(normalizeQuestionKey(getQuestionText(item))))
   if (pool.length === 0) pool = [...items]
   pool.sort((a, b) => toolsPriorityScore(getQuestionText(b)) - toolsPriorityScore(getQuestionText(a)))
   return pool.slice(0, Math.min(maxCount, pool.length))
@@ -61,6 +70,16 @@ export function prepareModulo1Items(workplace, items) {
 
 export function prepareQuizItems(workplace, items) {
   return prepareExamQuestionPool(workplace, items, (q) => q.question, EXAM_CAPS.quiz)
+}
+
+/** Rondas de ahorcado (cap separado en EXAM_CAPS.hangman). */
+export function prepareHangmanRounds(workplace, rounds) {
+  return prepareExamQuestionPool(
+    workplace,
+    rounds,
+    (r) => `${String(r.word ?? '')}|${String(r.clue ?? '')}`,
+    EXAM_CAPS.hangman,
+  )
 }
 
 export function prepareTrueFalseItems(workplace, items) {

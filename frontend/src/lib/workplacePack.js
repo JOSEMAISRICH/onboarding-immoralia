@@ -11,6 +11,12 @@ import { preguntas as quizImmoralia } from '../data/preguntas'
 import { preguntasMiniValores } from '../data/miniValoresJuego'
 import { pasosProceso as pasosGeneral } from '../data/pasosProceso'
 import { quizGeneral } from '../data/workplaceQuizGeneral'
+import {
+  hangmanBankGeneral,
+  hangmanBankImmoralia,
+  hangmanBankImcontent,
+  hangmanBankImmedia,
+} from '../data/workplaceHangman'
 import { modulo1Imcontent, modulo1General, modulo1Immoralia, modulo1Immedia } from '../data/workplaceModulo1Repaso'
 import { quizImcontent, quizImmedia } from '../data/workplaceQuizVertical'
 import {
@@ -52,6 +58,15 @@ import {
 } from '../data/workplaceMiniNewFour'
 import { normalizeWorkplaceId } from '../data/workplace'
 import { EXAM_CAPS } from './examQuestionCaps'
+
+/** Banco de palabras para el ahorcado (paso 3). */
+export function getHangmanBank(wp) {
+  const w = normalizeWorkplaceId(wp)
+  if (w === 'immoralia') return hangmanBankImmoralia
+  if (w === 'general') return hangmanBankGeneral
+  if (w === 'immedia') return hangmanBankImmedia
+  return hangmanBankImcontent
+}
 
 /** @param {string} wp */
 export function getScenarioRounds(wp) {
@@ -194,7 +209,7 @@ export function getMaxByModuleForWorkplace(workplace) {
   return {
     registros: EXAM_CAPS.modulo1 * 10,
     valores: VALORES_MAX,
-    quiz: EXAM_CAPS.quiz * 20,
+    quiz: EXAM_CAPS.hangman * 20,
     puzzle: PUZZLE_MAX,
     miniTrueFalse: EXAM_CAPS.trueFalse * 8,
     miniMatch: pairs.length * 10,

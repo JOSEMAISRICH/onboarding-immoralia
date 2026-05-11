@@ -1,4 +1,5 @@
 import { normalizeWorkplaceId } from '../data/workplace'
+import { normalizeQuestionKey } from './seenQuestionsStore'
 
 const PREFIX = 'immoralia-minigame-resume:v1'
 
@@ -17,17 +18,36 @@ export function resumeShortHash(text) {
   return (h >>> 0).toString(36)
 }
 
+/** Hash de contenido largo (huellas de listas); `resumeShortHash` solo mira 120 chars. */
+export function resumeContentHash(text, maxChars = 16000) {
+  const s = String(text ?? '').slice(0, maxChars)
+  let h = 2166136261
+  for (let i = 0; i < s.length; i += 1) {
+    h ^= s.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return (h >>> 0).toString(36)
+}
+
+/** Rondas de ahorcado (palabras elegidas en la sesión). */
+export function fingerprintHangman(rounds) {
+  if (!rounds?.length) return '0'
+  const ids = rounds.map((r) => String(r.word ?? '').toUpperCase()).join(',')
+  return `${rounds.length}:${resumeContentHash(ids)}`
+}
+
 /** Huella para arrays de preguntas tipo quiz (campo question). */
 export function fingerprintQuestions(list, field = 'question') {
   if (!list?.length) return '0'
-  const head = list[0]?.[field] ?? ''
-  return `${list.length}:${resumeShortHash(head)}`
+  const payload = list.map((item) => normalizeQuestionKey(String(item?.[field] ?? ''))).join('\x1f')
+  return `${list.length}:${resumeContentHash(payload)}`
 }
 
 /** Verdadero/falso u ódd one con `.text` */
 export function fingerprintByText(list) {
   if (!list?.length) return '0'
-  return `${list.length}:${resumeShortHash(list[0]?.text ?? '')}`
+  const payload = list.map((item) => normalizeQuestionKey(String(item?.text ?? ''))).join('\x1f')
+  return `${list.length}:${resumeContentHash(payload)}`
 }
 
 export function fingerprintPairs(pairs) {
@@ -49,14 +69,15 @@ export function fingerprintWordle(config) {
 /** Escenarios / a quién consultar */
 export function fingerprintPromptField(rounds, field) {
   if (!rounds?.length) return '0'
-  return `${rounds.length}:${resumeShortHash(rounds[0]?.[field] ?? '')}`
+  const payload = rounds.map((r) => normalizeQuestionKey(String(r?.[field] ?? ''))).join('\x1f')
+  return `${rounds.length}:${resumeContentHash(payload)}`
 }
 
 /** Palabras revueltas */
 export function fingerprintScrambleRounds(rounds) {
   if (!rounds?.length) return '0'
-  const head = rounds[0]?.hint ?? rounds[0]?.answer ?? ''
-  return `${rounds.length}:${resumeShortHash(String(head))}`
+  const payload = rounds.map((r) => `${r.hint ?? ''}|${r.answer ?? ''}`).join('\x1f')
+  return `${rounds.length}:${resumeContentHash(payload)}`
 }
 
 /**

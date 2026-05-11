@@ -5,7 +5,10 @@
 export const EXAM_CAPS = {
   modulo1: 5,
   quiz: 4,
+  /** Rondas del ahorcado (paso 3); no usar para el quiz MCQ antiguo. */
+  hangman: 7,
   trueFalse: 4,
   oddOne: 3,
-  scramble: 2,
+  /** Palabra revuelta: un poco mas de peso para no ser el paso mas corto del bloque central. */
+  scramble: 3,
 }

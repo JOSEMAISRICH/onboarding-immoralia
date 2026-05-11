@@ -121,7 +121,7 @@ function EmbeddedSequentialQuiz({ questions, pointsPerCorrect, modoMinijuego, on
           }
           return (
             <button
-              key={option}
+              key={`emb-${questionIndex}-opt-${optionIndex}`}
               type="button"
               className={className}
               onClick={() => pick(optionIndex)}
@@ -355,7 +355,7 @@ function FullSequentialQuiz({
             }
             return (
               <button
-                key={option}
+                key={`t-${questionIndex}-opt-${optionIndex}`}
                 type="button"
                 className={className}
                 onClick={() => pick(optionIndex)}

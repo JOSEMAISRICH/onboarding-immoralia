@@ -5,7 +5,7 @@ import MiniOddOne from '../modules/MiniOddOne'
 import MiniScramble from '../modules/MiniScramble'
 import MiniTrueFalse from '../modules/MiniTrueFalse'
 import Puzzle from '../modules/Puzzle'
-import Quiz from '../modules/Quiz'
+import MiniHangman from '../modules/MiniHangman'
 import MiniModulo1Repaso from '../modules/MiniModulo1Repaso'
 import MiniValoresJuego from '../modules/MiniValoresJuego'
 import MiniMemory from '../modules/MiniMemory'
@@ -25,7 +25,7 @@ export function GamesStepContent({
   finishStep,
   extraStartStep,
   workplace,
-  quizPreguntas,
+  hangmanRounds,
   tfItems,
   matchPairs,
   scrambleRounds,
@@ -114,11 +114,13 @@ export function GamesStepContent({
       )
     case 3:
       return (
-        <Quiz
+        <MiniHangman
           workplace={workplace}
-          questions={quizPreguntas}
+          rounds={hangmanRounds}
           onComplete={(earnedPoints) =>
-            beatClear(3, earnedPoints, 'Gran quiz', () => () => recordModuleScore('quiz', earnedPoints))
+            beatClear(3, earnedPoints, 'El ahorcado', () => () =>
+              recordModuleScore('quiz', earnedPoints),
+            )
           }
         />
       )

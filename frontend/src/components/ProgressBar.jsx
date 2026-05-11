@@ -31,7 +31,10 @@ function ProgressBar({
   const barWidth = journeyCompletionPercent
 
   return (
-    <header className="sticky top-0 z-20 border-b border-blue-100/95 bg-white/90 px-5 py-4 shadow-md shadow-blue-100/40 backdrop-blur-md">
+    <header
+      id="onboarding-progress-bar"
+      className="sticky top-0 z-20 border-b border-blue-100/95 bg-white/90 px-5 py-4 shadow-md shadow-blue-100/40 backdrop-blur-md"
+    >
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="min-w-0 space-y-1">
           <p className="text-lg font-bold md:text-xl">
