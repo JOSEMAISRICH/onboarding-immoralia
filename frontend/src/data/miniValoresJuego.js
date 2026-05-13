@@ -1,4 +1,4 @@
-/** Minijuego: unir frase clave con el valor del manifiesto (10 pts por acierto). */
+/** Minijuego: unir frase clave con el valor del manifiesto (10 pts por acierto). Orden de opciones se baraja en UI. */
 export const MINI_VALORES_POINTS = 10
 
 export const preguntasMiniValores = [
@@ -86,6 +86,42 @@ export const preguntasMiniValores = [
     correctIndex: 2,
     explanation:
       'Transparencia construye confianza con hechos y claridad, sin letra pequena.',
+  },
+  {
+    id: 11,
+    question:
+      'Tras un lanzamiento, cerramos el ciclo midiendo impacto y decidiendo que repetir o cortar: eso es pensar en...',
+    options: ['Servicio', 'Resultados', 'Transparencia', 'Innovacion'],
+    correctIndex: 1,
+    explanation:
+      'Resultados: lo que importa es el efecto en negocio y equipo; si no suma, no se mantiene.',
+  },
+  {
+    id: 12,
+    question:
+      'Un cliente llega bloqueado fuera de scope y le orientamos con siguiente paso util sin esquivar el problema: gesto muy de...',
+    options: ['Innovacion', 'Servicio', 'Transparencia', 'Resultados'],
+    correctIndex: 1,
+    explanation:
+      'Servicio: ir mas alla de lo esperado y acompanar; no quedarse en el minimo ejecutable.',
+  },
+  {
+    id: 13,
+    question:
+      'En reunion critica explicas por que una fecha es realista o no, con datos y riesgos visibles para todos: encaja con...',
+    options: ['Innovacion', 'Resultados', 'Transparencia', 'Servicio'],
+    correctIndex: 2,
+    explanation:
+      'Transparencia: hablar claro sobre limites y compromisos, sin letra pequena.',
+  },
+  {
+    id: 14,
+    question:
+      'Pilotamos una automatizacion pequeña, medimos y solo entonces escalamos: innovacion como herramienta, valor...',
+    options: ['Servicio', 'Transparencia', 'Innovacion', 'Resultados'],
+    correctIndex: 2,
+    explanation:
+      'Innovacion ordenada: probar con criterio para resolver huecos reales, no postureo.',
   },
 ]
 

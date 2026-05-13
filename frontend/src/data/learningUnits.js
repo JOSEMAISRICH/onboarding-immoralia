@@ -22,7 +22,8 @@ export function getLearningUnits(finishStepIndex) {
     {
       stepIndex: 2,
       title: 'Valores del manifiesto',
-      objective: 'Diez preguntas rapidas: enlazar frases y situaciones con Servicio, Transparencia, Innovacion y Resultados.',
+      objective:
+        'Catorce preguntas rapidas: enlazar frases y situaciones con Servicio, Transparencia, Innovacion y Resultados.',
       minutes: 6,
       emoji: '💎',
     },
@@ -44,8 +45,8 @@ export function getLearningUnits(finishStepIndex) {
     {
       stepIndex: 5,
       title: 'Verdadero o falso',
-      objective: 'Afirmaciones rapidas sobre como trabajamos.',
-      minutes: 3,
+      objective: 'Seis afirmaciones rapidas sobre como trabajamos.',
+      minutes: 4,
       emoji: '✅',
     },
     {

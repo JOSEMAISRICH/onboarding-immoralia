@@ -31,6 +31,21 @@ function evaluateGuess(secret, guess) {
   return result
 }
 
+/** Por cada posición: letra ya confirmada (verde en algún intento), o null si aún no. */
+function computeLockedLetters(secret, guesses) {
+  const n = secret.length
+  const slots = /** @type {(string | null)[]} */ (Array(n).fill(null))
+  for (const gw of guesses) {
+    const g = gw.trim().toUpperCase()
+    if (g.length !== n) continue
+    const ev = evaluateGuess(secret, g)
+    for (let i = 0; i < n; i += 1) {
+      if (ev[i] === 'correct') slots[i] = secret[i]
+    }
+  }
+  return slots
+}
+
 /** @param {{ workplace?: string, onComplete: (pts: number) => void, config: { word: string, clue: string }, examRoundOffset?: number, examTotalSlots?: number, roundMeta?: { current: number, total: number } | null, continueLabel?: string }} props */
 function MiniWordle({
   workplace = 'immoralia',
@@ -98,6 +113,8 @@ function MiniWordle({
 
   const attemptNum = guesses.length + (done ? 0 : 1)
 
+  const lockedByPosition = useMemo(() => computeLockedLetters(secret, guesses), [secret, guesses])
+
   return (
     <ModuleWrapper
       title="Minijuego: Palabra oculta"
@@ -106,6 +123,30 @@ function MiniWordle({
       <div className="mb-4 rounded-xl border border-sky-200 bg-gradient-to-br from-sky-50 to-blue-50/90 px-4 py-3 shadow-sm">
         <p className="text-[11px] font-bold uppercase tracking-wider text-sky-950">Pista</p>
         <p className="mt-1 text-base font-semibold leading-snug text-slate-900">{config.clue}</p>
+      </div>
+
+      <div className="mb-4 rounded-xl border border-emerald-200/90 bg-emerald-50/40 px-3 py-3 shadow-sm">
+        <p className="text-center text-[11px] font-bold uppercase tracking-wider text-emerald-950">
+          Letras bien colocadas (en orden)
+        </p>
+        <p className="mt-1 text-center text-xs text-slate-600">
+          Se rellena cada casilla cuando esa letra sale verde en algun intento.
+        </p>
+        <div className="mt-3 flex flex-wrap justify-center gap-1.5 sm:gap-2">
+          {lockedByPosition.map((ch, i) => (
+            <span
+              key={i}
+              className={`flex h-11 min-w-[2.25rem] items-center justify-center rounded-lg border-2 px-1 font-mono text-xl font-bold uppercase tabular-nums sm:h-12 sm:min-w-[2.5rem] sm:text-2xl ${
+                ch
+                  ? 'border-emerald-400 bg-emerald-100 text-emerald-950 shadow-inner'
+                  : 'border-slate-300 bg-white text-slate-400'
+              }`}
+              aria-label={ch ? `Letra ${i + 1}: ${ch}` : `Letra ${i + 1}: aun sin acierto en posicion`}
+            >
+              {ch ?? '—'}
+            </span>
+          ))}
+        </div>
       </div>
 
       <p className="mb-3 text-sm font-semibold text-slate-700">
